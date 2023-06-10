@@ -1,0 +1,330 @@
+create or replace PROCEDURE updatelogs(APosizione9 IN integer,DaPosizione9 IN integer, IDPartita19 IN integer,Pedina9 IN VARCHAR2,Turno9 IN INTEGER, TipoMossa9 IN VARCHAR2,Sezione9 IN INTEGER) IS
+    prezzo INTEGER;
+    v_co4 logpartecipante.saldo%type;
+    v_coo4 logpartecipante.saldo%type;
+    dapay INTEGER;
+    maxturno INTEGER;
+    maxturnoo INTEGER;  
+    conto1 INTEGER;
+    conto2 INTEGER;
+    contratto Contratti%rowtype;
+    spec Speciale%rowtype;
+    maxord INTEGER;
+    maxordd INTEGER;
+    maxordsupp INTEGER;
+    contop integer;
+    contoss integer;
+BEGIN 
+    select count(*) into contop
+    from  carta
+    where idpartita=idpartita19;
+    if(contop<>0) then
+    dapay:=0;
+    maxord:=0;
+    maxordd:=0;
+    maxordsupp:=0;
+    conto1:=0;
+    conto2:=0;
+    prezzo:=0;
+    DBMS_OUTPUT.PUT_LINE('Inizio updatelogs');
+    select max(turno) into maxturno
+    from logpartecipante 
+    where idpartita=idpartita19 and pedina=pedina9;
+    select max(ordine) into maxordsupp
+    from logpartecipante
+    where idpartita=idpartita19 and pedina=pedina9 and turno=maxturno-1;
+    select max(ordine) into maxord
+    from logpartecipante 
+    where idpartita=idpartita19 and pedina=pedina9 and turno=maxturno;
+
+    select logpartecipante.saldo INTO v_co4
+    FROM logpartecipante, partecipante 
+    where partecipante.idpartita=logpartecipante.idpartita and logpartecipante.idpartita=idpartita19 and logpartecipante.pedina=partecipante.pedina and partecipante.pedina=pedina9 and logpartecipante.turno= maxturno and logpartecipante.ordine=maxord;
+     
+    if(tipomossa9='0')THEN
+        --controllo se il contratto appartiene a qualcuno
+        SELECT Count(Pedina) into conto1
+        FROM Contratti 
+        WHERE Posizione=APosizione9 and IDPartita=idpartita19;
+        IF(conto1<>0) THEN
+            --seleziono informazioni per il contratto su cui siamo andati
+            SELECT * into contratto
+            FROM Contratti 
+            WHERE Posizione=APosizione9 and IDPartita=idpartita19;
+
+            IF (contratto.pedina<>pedina9) THEN
+                IF(contratto.colore IS NOT NULL) THEN
+                    --conto quanti contratti del colore del contratto possiede il proprietario
+                    SELECT Count(*) into conto1 
+                    FROM Contratti 
+                    WHERE Colore=contratto.colore and Pedina=contratto.pedina;
+                        IF(contratto.colore='Blu' OR contratto.colore='Viola')THEN
+                            IF(conto1=2)THEN
+                                -- trovo la rendita del contratto posedendo tutti i contratti di quel colore
+                                SELECT Prezzo*2 into dapay
+                                FROM Rendita 
+                                WHERE NomeContratto=contratto.nome and NumRendita=0 and IDPartita=IDPartita19;
+                                -- controllo se vi sono edifici sul contratto
+                                SELECT Count(*) INTO conto2 
+                                FROM Costruisce 
+                                WHERE IDPartita=idpartita19 and NomeContratto=Contratto.nome;
+                                IF(conto2<>0) THEN
+                                    -- se vi sono edifici sul contratto aggiorno il saldo da restaurare
+                                    SELECT Prezzo into dapay
+                                    FROM Rendita 
+                                    WHERE NomeContratto=contratto.nome and NumRendita=conto2 and IDPartita=IDPartita19;
+                                END IF;
+                            ELSE
+                                --il proprietario del contratto non possiede tutti i contratti di quel colore
+                                SELECT Prezzo into dapay
+                                FROM Rendita 
+                                WHERE NomeContratto=contratto.nome and NumRendita=0 and IDPartita=IDPartita19;
+                            END IF;    
+                        ELSE
+                            -- il contratto non è ne' blu ne' viola
+                            IF(conto1=3) THEN
+                                --il proprietario del contratto possiede tutti i contratti di quel colore
+                                SELECT Prezzo*2 into dapay 
+                                FROM Rendita 
+                                WHERE NomeContratto= contratto.nome and NumRendita=0 and IDPartita=IDPartita19;
+                                
+                            
+                                --controllo se vi sono edifici sul contratto
+                                SELECT Count(*) INTO conto2 
+                                FROM Costruisce 
+                                WHERE IDPartita=idpartita19 and NomeContratto=Contratto.nome;
+                                IF(conto2<>0) THEN
+                                    -- se vi sono edifici sul contratto aggiorno il saldo da restaurare
+                                    SELECT Prezzo into dapay
+                                    FROM Rendita 
+                                    WHERE NomeContratto=contratto.nome and NumRendita=conto2 and IDPartita=IDPartita19;
+                                END IF;
+                            ELSE
+                                --il proprietario del contratto non possiede tutti i contratti di quel colore
+                                SELECT Prezzo into dapay
+                                FROM Rendita 
+                                WHERE NomeContratto=contratto.nome and NumRendita=0 and IDPartita=IDPartita19;
+                            END IF;   
+                        END IF;
+                ELSE
+                    if(contratto.tipo IS NOT NULL) then 
+                        --conto quanti contratti di quel tipo possiede contratto.pedina
+                        SELECT count(*) into contoss
+                        FROM Contratti
+                        WHERE IDPartita=IDPartita19 AND Pedina=contratto.pedina AND Tipo=contratto.tipo;
+                        --contoss corrisponde alla rendita attuale del contratto
+                        SELECT Prezzo into dapay
+                        FROM Rendita
+                        WHERE IDPartita=IDPartita19 and NomeContratto=contratto.nome and NumRendita=contoss;
+                    end if;
+                END IF;
+            END IF;
+        end if;
+    ELSE
+        IF(tipomossa9='1') THEN
+            -- si tratta di una mossa di tipo spostamento+acquisto
+            SELECT * into contratto
+            FROM Contratti 
+            WHERE Posizione=aposizione9 and IDPartita=idpartita19;
+            prezzo:=contratto.prezzo;
+            dapay:=-1;
+        ELSE
+            IF(tipomossa9='2') THEN
+                --si tratta di una mossa di tipo spostamento+speciale
+                DBMS_OUTPUT.PUT_LINE('Si tratta di una mossa di tipo spost+spec');
+                select * into spec
+                from Speciale 
+                where posizione=aposizione9 and idpartita=idpartita19;
+                
+                    if(spec.tipospecial='Prigione' and spec.posizione=30) THEN dapay:=-4; ELSE
+                        if(spec.tipospecial='Prigione' and spec.posizione=10) THEN dapay:=-5; ELSE
+                            if(spec.tipospecial='ParcheggioGratuito') THEN dapay:=-5; --ELSE
+                           
+                            END IF;
+                        END IF;
+                    END IF;
+                
+                -- eseguo gli update per tipomossa=2
+                DBMS_OUTPUT.PUT_LINE('faccio gli update per tipomossa=2');
+                --controllo se è stato tirato un dado doppio o meno 
+                IF(sezione9=0) THEN --sezione uguale a zero
+                    IF (spec.tipospecial='Imprevisti' OR spec.tipospecial='Probabilita') THEN
+                        DBMS_OUTPUT.PUT_LINE('1');
+                        -- conto quanti log 
+                        FOR i in 0..maxord
+                            LOOP
+                                UPDATE LogPartecipante SET Posizione=daposizione9, Turno= maxturno-1, ordine=maxordsupp+1 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9 AND ordine=i;
+                                maxordsupp:=maxordsupp+1;
+
+                            END LOOP;
+                            dapay:=0;
+                            DBMS_OUTPUT.PUT_LINE('il tipospecial è un imprevisto o probabilità');
+                    ELSE 
+                        IF(spec.tipospecial='Via') THEN 
+                            FOR i in 0..maxord
+                                LOOP
+                                    UPDATE LogPartecipante SET Saldo= v_co4-200, Posizione=daposizione9, Turno= maxturno-1, ordine=maxordsupp+1 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9 AND ordine=i;
+                                    maxordsupp:=maxordsupp+1;
+                                END LOOP;
+                        ELSE
+                            IF(spec.tipospecial='TassaDelLusso') THEN
+                                FOR i in 0..maxord
+                                    LOOP
+                                        UPDATE LogPartecipante SET Saldo= v_co4+200, Posizione=daposizione9, Turno= maxturno-1, ordine=maxordsupp+1 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno= turno9 AND ordine=i;
+                                        maxordsupp:=maxordsupp+1;
+                                    END LOOP;
+
+                            ELSE 
+                                IF(spec.tipospecial='TassaPatrimoniale') THEN
+                                    for i in 0..maxord
+                                        loop
+                                            UPDATE LogPartecipante SET Saldo= v_co4+500, Posizione=daposizione9, Turno= maxturno-1, ordine=maxordsupp+1 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9 and ordine=i;
+                                            maxordsupp:=maxordsupp+1;
+                                        end loop;
+                                END IF;
+                            END IF;
+                        END IF;
+                    END IF;  
+                else--sezione diversa da zero 
+                    IF (spec.tipospecial='Imprevisti' OR spec.tipospecial='Probabilita') THEN
+                        -- conto quanti log 
+                        UPDATE LogPartecipante SET Posizione=daposizione9  WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9;
+                    ELSE 
+                        IF(spec.tipospecial='Via') THEN 
+                            UPDATE LogPartecipante SET Saldo= v_co4-200, Posizione=daposizione9 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9;
+
+                        ELSE
+                            IF(spec.tipospecial='TassaDelLusso') THEN
+                                UPDATE LogPartecipante SET Saldo= v_co4+200, Posizione=daposizione9 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9;
+
+                            ELSE 
+                                IF(spec.tipospecial='TassaPatrimoniale') THEN
+                                    UPDATE LogPartecipante SET Saldo= v_co4+500, Posizione=daposizione9 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno= turno9;
+
+                                END IF;
+                            END IF;
+                        END IF;
+                    END IF;  
+                END IF;
+            END IF;
+        END IF;
+    END IF;
+
+    DBMS_OUTPUT.PUT_LINE('Aggiornati dapays');
+    --controllo se la sezione della mossa è diversa da zero 
+    if(sezione9=0) then
+        IF(dapay=-1) THEN
+            --aggiorno saldo e posizione (tipo acquisto)
+            for i in 0..maxord
+                loop
+                    UPDATE LogPartecipante SET Saldo= v_co4+prezzo , Posizione=daposizione9, Turno= maxturno-1, ordine=maxordsupp+1 WHERE IDPartita= idpartita19 and pedina=pedina9 and turno=turno9 and ordine=i;
+                    maxordsupp:=maxordsupp+1;
+                end loop;      
+            --aggiorno il proprietario del contratto a null
+            UPDATE Contratti SET Pedina=null, Acquistata=0 WHERE Nome=Contratto.nome and IDPartita=idpartita19;
+        ELSE
+            IF(dapay=-5) THEN   
+                --aggiorno solo posizione (Transito e ParcheggioGratuito)
+                for i in 0..maxord
+                    loop
+                        UPDATE LogPartecipante SET Posizione= daposizione9, Turno= maxturno-1, ordine=maxordsupp+1 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9 and ordine=i;
+                        maxordsupp:=maxordsupp+1;
+                    end loop;
+            ELSE
+                IF(dapay=-4)THEN
+                    --aggiorno posizione e in prigione (VaiInPrigione)
+                    for i in 0..maxord
+                        loop
+                            UPDATE LogPartecipante SET Posizione= daposizione9, InPrigione=0, Turno= maxturno-1, ordine=maxordsupp+1 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9 and ordine=i;
+                            maxordsupp:= maxordsupp+1;
+                        end loop;
+                ELSE
+                    IF(dapay!=0 and tipomossa9='0')THEN
+                        --la mossa era di tipo 0, aggiungop i soldi al pagante
+                        for i in 0..maxord
+                            LOOP
+                                UPDATE LogPartecipante SET Saldo=v_co4+dapay, Posizione=daposizione9, Turno= maxturno-1, ordine=maxordsupp+1 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9 and ordine=i;
+                                maxordsupp:=maxordsupp+1;
+                            end loop;
+                        --adesso, sottraggo i soldi guadaganti al proprietario:
+                        --1)recupero l' ultimo log del proprietario
+                        select max(turno) into maxturnoo 
+                        from logpartecipante 
+                        where idpartita=idpartita19 and pedina=contratto.pedina;
+
+                        select logpartecipante.saldo INTO v_coo4 
+                        FROM LogPartecipante,Partecipante
+                        where partecipante.idpartita=logpartecipante.idpartita and logpartecipante.idpartita=idpartita19 and logpartecipante.pedina=partecipante.pedina  and partecipante.pedina=contratto.pedina and logpartecipante.turno=maxturnoo and logpartecipante.ordine in ( select max(ordine) 
+
+                                                                                                                                                                                                                                                                                    from logpartecipante
+                                                                                                                                                                                                                                                                                    where idpartita=idpartita19 and pedina=contratto.pedina and turno=maxturnoo);
+                        select max(ordine) into maxordd
+                        from logpartecipante 
+                        where idpartita=idpartita19 and pedina=contratto.pedina and turno=maxturno;
+                       
+                        UPDATE LogPartecipante SET Saldo=v_coo4-dapay WHERE idpartita=idpartita19 and pedina=contratto.pedina and turno=maxturnoo;
+                        delete from LogPagamento where IDPartita1=IDPartita19 and Pedina1=Pedina9 and Pedina2=contratto.pedina and posizione=contratto.posizione and prezzopagato=dapay;
+                    ELSE
+                        IF (dapay=0 and tipomossa9='0') then
+                            for i in 0..maxord
+                            LOOP
+                                UPDATE LogPartecipante SET Posizione=daposizione9, Turno= maxturno-1, ordine=maxordsupp+1 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9 and ordine=i;
+                                maxordsupp:=maxordsupp+1;
+                            end loop;
+                        END IF;    
+                    END IF;
+                END IF;
+            END IF;
+        END IF;
+    else -- vi è stato un dado doppio 
+        IF(dapay=-1) THEN
+            --aggiorno saldo e posizione (tipo acquisto)
+            UPDATE LogPartecipante SET Saldo= v_co4+prezzo , Posizione=daposizione9 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9;
+            --aggiorno il proprietario del contratto a null
+            UPDATE Contratti SET Pedina=null, acquistata=0 WHERE Nome=Contratto.nome and IDPartita=idpartita19;
+        ELSE
+            IF(dapay=-5) THEN   
+                --aggiorno solo posiziione (Transito e ParcheggioGratuito)
+                UPDATE LogPartecipante SET Posizione= daposizione9 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9;
+             ELSE
+                IF(dapay=-4)THEN
+                    --aggiorno posizione e in prigione (VaiInPrigione)
+                    UPDATE LogPartecipante SET Posizione= daposizione9, InPrigione=0 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9;
+
+                ELSE
+                    IF(dapay!=0 and tipomossa9='0')THEN
+                        --la mossa era di tipo 0, aggiungop i soldi al pagante
+                        UPDATE LogPartecipante SET Saldo=v_co4+dapay, Posizione=daposizione9 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9;
+
+                        --adesso, sottraggo i soldi guadaganti al proprietario:
+                        --1)recupero l' ultimo log del proprietario
+                        DBMS_OUTPUT.PUT_LINE('dapay='|| dapay);
+                        select max(turno) into maxturnoo 
+                        from logpartecipante 
+                        where idpartita=idpartita19 and pedina=contratto.pedina;
+
+                        select logpartecipante.saldo INTO v_coo4 
+                        FROM LogPartecipante,Partecipante
+                        where partecipante.idpartita=logpartecipante.idpartita and logpartecipante.idpartita=idpartita19 and logpartecipante.pedina=partecipante.pedina and partecipante.pedina=contratto.pedina and logpartecipante.turno=maxturnoo and logpartecipante.ordine in ( select max(ordine) 
+
+                                                                                                                                                                                                                                                                                    from logpartecipante
+                                                                                                                                                                                                                                                                                    where idpartita=idpartita19 and pedina=contratto.pedina and turno=maxturnoo);
+                        select max(ordine) into maxordd
+                        from logpartecipante 
+                        where idpartita=idpartita19 and pedina=contratto.pedina and turno=maxturnoo;
+                         UPDATE LogPartecipante SET Saldo=v_coo4-dapay WHERE idpartita=idpartita19 and pedina=contratto.pedina and turno=maxturnoo;
+                        
+                        delete from LogPagamento where IDPartita1=IDPartita19 and Pedina1=Pedina9 and Pedina2=contratto.pedina and posizione=contratto.posizione and prezzopagato=dapay;
+                    ELSE
+                        -- il contratto appartiene a chi fa la mossa (dapay=0)
+                        if(tipomossa9='0' and dapay=0) then
+                            UPDATE LogPartecipante SET Posizione=daposizione9 WHERE IDPartita=idpartita19 and pedina=pedina9 and turno=turno9;
+                        end if;
+                    END IF;
+                END IF;
+            END IF;
+        END IF;
+    end if;
+end if;
+COMMIT;
+END updatelogs;

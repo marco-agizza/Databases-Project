@@ -1,0 +1,1371 @@
+
+
+create or replace TRIGGER addEd
+	BEFORE INSERT ON Costruisce
+	FOR EACH ROW 
+ 	DECLARE
+		CountAlbergo INTEGER;
+		CountCasa INTEGER;
+		CountAlbergo1 INTEGER;
+		CountCasa1 INTEGER;
+		NotBuild EXCEPTION; 
+	BEGIN 
+		SELECT COUNT(*) INTO CountCasa
+		FROM Costruisce
+		WHERE :new.NomeContratto=NomeContratto AND IDed='Casa' AND :new.IDPartita=IDPartita;
+
+             		SELECT COUNT(*) INTO CountAlbergo
+		FROM Costruisce
+		WHERE :new.NomeContratto=NomeContratto AND IDed='Albergo' AND :new.IDPartita=IDPartita;
+		CountCasa:= CountCasa+(CountAlbergo*4); 
+        --il numero di case tot per il nostro contratto PRIMA di :nedIDed
+		FOR Contratto IN (	SELECT Nome
+                            FROM Contratti
+                            WHERE  :new.NomeContratto<>Nome AND :new.IDPartita=IDPartita 	AND Colore IN  (SELECT Colore
+                                                                                                    FROM Contratti
+                                                                                                    WHERE :new.NomeContratto=Nome AND :new.IDPartita=IDPartita))
+			LOOP
+				SELECT COUNT(*) INTO CountCasa1
+                FROM Costruisce				
+                WHERE NomeContratto = Contratto.Nome AND Ided='Casa' AND :new.IDPartita=IDPartita;
+
+                SELECT COUNT(*) INTO CountAlbergo1
+				FROM Costruisce
+				WHERE NomeContratto = Contratto.Nome AND Ided='Albergo' AND :new.IDPartita=IDPartita;
+
+                CountCasa1:= CountCasa1+(CountAlbergo1*4);
+                IF (CountCasa1-CountCasa=0 OR CountCasa1-CountCasa=1) THEN
+					Dbms_output.put_line('Building');
+				ELSE 
+					RAISE NotBuild;
+                END IF;
+            END LOOP;
+	EXCEPTION
+		WHEN NotBuild THEN 
+                        RAISE_APPLICATION_ERROR(-20004, 'Controlla che il numero di case sui contratti dello stesso colore abbiano al piu un edificio di differenza');
+	END;
+
+/
+create or replace Trigger CheckMossa
+Before Insert on mossa
+for each row
+declare
+DontMove exception;
+begin
+	--Controllo gli attributi della mossa per vederne la validita'
+    if ( :new.posizionespec<> NULL) then
+        if( :new.posizionespec <> :new.aposizione) then
+            raise DontMove;
+        end if;
+    end if;
+    if( :new.NomeContrattoAcq <> NULL) then
+        if ( :new.NomeContrattoAcq <> :new.nomecontratto) then
+            raise DontMove;
+        end if;
+    end if;
+Exception 
+    WHEN DontMOve then dbms_output.put_line(' Spostamento Invalido ' ) ;
+End ;
+/
+create or replace Trigger CHeckPartita1
+Before Insert on Mossa
+For Each Row
+Declare
+NotPartita Exception;
+Begin 
+    if( :new.IdPartita <> NULL and :new.IdPartita<> :new.IdPartita1 ) then
+        raise NotPartita;
+    End if;
+    if( :new.IdPartitaPed <> NULL and :new.IdPartitaPed<> :new.IdPartita1 ) then
+        raise NotPartita;
+    End if;
+    if( :new.IdPartitaAcq <> NULL and :new.IdPartitaAcq<> :new.IdPartita1 ) then
+        raise NotPartita;
+    End if;
+    if( :new.IdPartitaSpec <> NULL and :new.IdPartitaSpec<> :new.IdPartita1 ) then
+        raise NotPartita;
+    End if;
+Exception
+    WHEN NotPartita then  RAISE_APPLICATION_ERROR(-20004, 'Le partite devono essere tutte uguali');
+END ;
+/
+create or replace Trigger CHeckPartita2
+Before Insert on Contratti
+For Each Row
+Declare
+NotPartita Exception;
+Begin 
+ if( :new.idpartita1 <> NULL) then
+        if ( :new.IdPartita <> :new.IdPartita1  )  then
+                raise NotPartita;
+        End if;
+  end if;
+Exception
+
+WHEN NotPartita then  RAISE_APPLICATION_ERROR(-20004, 'Le partite devono essere tutte uguali');
+END ;
+/
+create or replace Trigger CHeckPartita3
+Before Insert on LogPagamento
+For Each Row
+Declare
+NotPartita Exception;
+Begin 
+if ( :new.IdPartita2 <> :new.IdPartita1  )  then
+        raise NotPartita;
+End if;
+
+Exception
+
+WHEN NotPartita then  RAISE_APPLICATION_ERROR(-20004, 'Le partite devono essere tutte uguali');
+END ;
+/
+create or replace Trigger CheckPartita4
+Before Insert on Carta
+for each row
+declare
+NotPartita Exception;
+begin
+  if ( :new.idpartitaped <> NULL) then
+        if ( :new.idpartitaped <> :new.idpartita) then
+                raise NotPartita;
+
+        end if;
+  end if;
+  exception 
+  WHEN NotPartita then  RAISE_APPLICATION_ERROR(-20004, 'Le partite devono essere tutte uguali');
+  end ;
+/
+create or replace TRIGGER checkpos 
+	AFTER INSERT ON LogPartecipante
+	FOR EACH ROW
+    
+    DECLARE
+	PRAGMA AUTONOMOUS_TRANSACTION;
+    	NumRend INTEGER;
+		daPay Rendita.Prezzo%TYPE;
+		Beneficiario Contratti.Pedina%TYPE;
+        Conto1 integer;
+        Conto2 integer;
+         moltiplica integer :=1;
+        lastlogbeneficiario logpartecipante%rowtype;
+        massimo integer;
+        Dacolore contratti%rowtype;
+        MaxOrd integer;
+    logesistente integer;
+    lastlog logpartecipante%rowtype;
+    lastpagamento logpagamento%rowtype;
+    HoGiocato  integer;
+    MAxOrdB  integer;
+    BEGIN
+    
+
+    
+        
+		 SELECT Count(*) as Conteggio into Conto1
+        	 FROM Contratti  C
+	     	WHERE IDPartita=:new.IDPartita AND :new.Pedina<>Pedina and NOT( C.Pedina IS NULL ) and :new.Posizione=Posizione;
+
+               
+                if( Conto1 = 0 )then
+                  --Se non devono essere svolti pagamenti perche' nessuno possiede il contratto
+                  GOTO USCITA;
+                  end if;
+
+                if ( conto1 <> 0 ) then 
+                 	--Se  devono essere svolti pagamenti perche' nessuno possiede il contratto, controllo il beneficiario del pagamento
+                SELECT Pedina INTO Beneficiario
+                FROM Contratti
+                WHERE Posizione=:new.Posizione AND :new.IDPartita=IDPartita;
+
+
+                  SELECT Count(Posizione) as Conteggio into Conto2
+                  FROM Contratti
+                 WHERE (Tipo='Stazione' OR Tipo='Societa') and :new.Posizione= Posizione;
+
+
+			--Controlliamo tipo e colore del contratto per estrarre la rendita giusta da far pagare all'utente
+                    IF (Conto2 <> 0)   THEN
+                                    SELECT COUNT(*) INTO NumRend
+                                    FROM Contratti
+                                    WHERE Pedina =Beneficiario AND Tipo IN (	SELECT Tipo
+                                                                     FROM Contratti 
+                                                                 WHERE Posizione=:new.Posizione AND :new.IDPartita=IDPartita) ;
+                                ELSE 
+                                    
+                                    SELECT COUNT(*) INTO NumRend
+                                    FROM Costruisce
+                                    WHERE NomeContratto IN (SELECT Nome FROM Contratti WHERE :new.IDPartita=IDPartita AND Posizione=:new.Posizione ) AND :new.IDPartita=IDPartita;
+                                    if( NumRend=0) then
+                                    
+                                        select count(*) into NumRend
+                                        from  contratti
+                                        where pedina=beneficiario and idpartita=:new.idpartita and idpartita1=:new.idpartita and 
+                                        colore = ( Select colore
+                                                   from contratti
+                                                   where pedina=beneficiario and idpartita=:new.idpartita and idpartita1=:new.idpartita and :new.posizione=posizione); 
+
+
+
+                                        select * into DaColore
+                                        from  contratti
+                                        where pedina=beneficiario and idpartita=:new.idpartita and idpartita1=:new.idpartita and :new.posizione=posizione; 
+
+
+                                       if(NumRend = 2  AND ( DaColore.colore='Blu' or Dacolore.colore='Viola' ) )then
+                                    
+                                            NumRend:=0; 
+                                            Moltiplica:=2; 
+                                        else if (NumRend=3) then
+                                                NumRend:=0; 
+                                                Moltiplica:=2;
+                                            else NumRend:=0;
+                                            end if;
+                                        end if;      
+
+                                    end if;
+                      END IF;
+
+
+         --Calcolato il NumRend selezioniamo la Rendita
+
+               SELECT Prezzo INTO daPay
+                FROM Rendita
+              WHERE NumRendita=NumRend AND :new.IDPartita=IDPartita AND  NomeContratto IN (SELECT Nome FROM Contratti WHERE :new.IDPartita=IDPartita AND Posizione=:new.Posizione) ;
+
+
+		
+
+        select Max(ordine) into MaxOrd
+        from logpagamento
+        where turno=:new.turno and :new.pedina=pedina1 and :new.idpartita=idpartita1;
+       
+        If(MaxOrd IS NULL) then
+      
+        MaxOrd:=-1;
+        end if;
+       
+        if(MaxOrd <> :new.ordine) then
+       		--Controlliamo se il pagamento e' stato gia' effettuato precedentemente o se si deve effettuare
+                      
+                      if( MaxOrd <> -1) then
+                         select * into lastpagamento
+                         from  logpagamento
+                         where turno=:new.turno and :new.pedina=pedina1 and :new.idpartita=idpartita1 and ordine=MaxOrd;
+                      else   
+                             select Max(ordine) into MaxOrdB
+                                from logpagamento
+                              where turno=:new.turno-1 and :new.pedina=pedina1 and :new.idpartita=idpartita1;
+                        if ( MaxOrdB IS NOT NULL ) then
+                            select * into lastpagamento
+                           from  logpagamento
+                           where turno=:new.turno-1 and :new.pedina=pedina1 and :new.idpartita=idpartita1 and ordine=MaxOrdB;
+                       else 
+                                lastpagamento.posizione:=-10;
+                                lastpagamento.turno:=-2;
+                        end if;
+                        end if;
+            if( lastpagamento.posizione=:new.posizione) then
+                   
+                    select  Count(*) into HoGiocato
+                    from mossa
+                    where tipomossa=0 and pedina=lastpagamento.pedina1 and idpartita1=idpartita and aposizione=lastpagamento.posizione and  :new.turno=turno;
+                    dbms_output.put_line('Dopo select Ho Giocato');
+                    dbms_output.put_line(HoGiocato || :new.turno);
+                if( lastpagamento.turno=:new.turno or HoGiocato=0) then
+                    	--Nel caso in cui ci sia gia' stato un pagamento in quel turno per non creare dei loop
+                        GOTO USCITA;
+                end if;
+          
+         end if;
+        
+            
+        --Inseriamo la transazione 
+        Insert into logpagamento VALUES ( :new.pedina , Beneficiario , :new.turno , (DaPay * Moltiplica) , :new.Idpartita , :new.IdPartita  , :new.ordine+1, :new.posizione);
+        Commit;
+        
+         Select Count(*) into LogEsistente
+          From LogPartecipante
+          Where beneficiario=pedina and :new.IdPartita=IdPartita and :new.turno=turno;
+
+        	--Controlliamo quale sia l'ultimo Log dei partecipanti da recuperare
+          if( LogEsistente <>0) then
+               
+              select * INTO lastlog
+              from  logpartecipante 
+              where :new.idpartita=idpartita and pedina=beneficiario and :new.turno=turno and ordine in (select max(ordine)
+                                                                                                    from logpartecipante
+                                                                                                    where  :new.idpartita=idpartita and pedina=beneficiario and :new.turno=turno);
+
+             dbms_output.put_line('Sto inserendo il beneficiario');
+              INSERT INTO logpartecipante values(lastlog.saldo + (DaPay * Moltiplica) , lastlog.numcontratti, :new.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita , lastlog.ordine + 1 , lastlog.inprigione);
+                COMMIT;
+          else select * INTO lastlog
+                from  logpartecipante 
+                 where :new.idpartita=idpartita and pedina=Beneficiario and :new.turno-1=turno and ordine in (select max(ordine)
+                                                                                                    from logpartecipante
+                                                                                                    where  :new.idpartita=idpartita and pedina=Beneficiario and :new.turno-1=turno);
+           INSERT INTo logpartecipante values(lastlog.saldo + (DaPay * Moltiplica) , lastlog.numcontratti, :new.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita , 0 , lastlog.inprigione);                
+           COMMIT;
+           end if;
+        end if;
+
+   
+
+		
+        if(MaxOrd <> :new.ordine) then
+           
+        INSERT INTO logpartecipante values( :new.saldo -( dapay  * moltiplica), :new.numcontratti, :new.turno , :new.posizione , :new.pedina , :new.idpartita , :new.ordine +1 , :new.inprigione);
+        COMMIT;
+
+
+      
+        end if;
+
+
+             END if;
+       <<USCITA>>
+             NULL; 
+             Commit;
+             END;
+/
+create or replace Trigger CheckSuccessione
+ Before insert on MOssa
+ for each row
+ declare 
+ NoInsert Exception;
+ NumMosse2 integer;
+ begin
+	--Controlliamo che l'ordine di ingresso delle mosse di una stessa pedina siano in successione
+         NumMosse2:=0;
+         if( :new.turno<> 0 ) then
+            
+          Select Count(*) into NumMosse2
+            From Mossa
+           Where :new.pedina=pedina and :new.idpartita1=IdPartita1 and turno=:new.turno-1;
+              
+                    if(NumMosse2 = 0 ) then
+                     raise NoInsert;
+                     end if;
+            end if;
+exception 
+          WHEN NoInsert then  RAISE_APPLICATION_ERROR(-20004, 'Inserire mosse del turno precedente');
+end ;
+/
+create or replace trigger CheckTurni
+Before insert on Mossa
+For each row
+Declare
+InvalidTurno Exception;
+TurnoMassimo Integer;
+Begin 
+    Select NumeroTurni into TurnoMassimo
+    From partita 
+    where idpartita = :new.idpartita1;
+	--Controlliamo che i turni siano inseriti in modo progressivo
+    if( :new.turno > TurnoMassimo) then 
+        raise invalidturno;
+    end if;
+
+    exception 
+        WHEN InvalidTurno then  RAISE_APPLICATION_ERROR(-20004, 'Turno non valido, impossibile eseguire nuove mosse');
+    end ;
+/
+create or replace TRIGGER checkValidContratto
+	BEFORE INSERT ON Costruisce
+	FOR EACH ROW 
+	DECLARE 
+		NotBuild EXCEPTION;
+        Conto Integer;
+	BEGIN 	
+	--Controlliamo che il contratto non sia di tipo Stazione e Societa' e quindi sia edificabile
+			SELECT Count(Nome) as Conteggio into Conto
+						FROM Contratti
+						WHERE Tipo='Stazione' OR Tipo='Societa' And Nome=:new.NomeContratto;       		
+			if( Conto <> 0) THEN
+            RAISE NotBuild;
+            end if ;
+    EXCEPTION
+		WHEN NotBuild THEN
+			Dbms_output.put_line('Il contratto non può possedere edilizie');
+	END;
+
+/
+create or replace trigger Consistenza
+before insert on mossa
+for each row
+declare
+lastlog logpartecipante%rowtype;
+noinsert exception;
+begin
+		--Controlliamo che l'ultima posizione registrata dell'utente rispetti la posizione di partenza della Mossa
+if ( :new.turno <>0 ) then   
+    if (:new.sezione = 0) then
+
+         select * INTO lastlog
+         from  logpartecipante 
+        where :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno-1=turno and ordine in (select max(ordine)
+                                                                                               from logpartecipante
+                                                                                                where  :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno-1=turno);
+   else
+         select * INTO lastlog
+         from  logpartecipante 
+         where :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno and ordine in (select max(ordine)
+                                                                                               from logpartecipante
+                                                                                                where  :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno);
+   end if;
+        dbms_output.put_line(:new.daposizione);
+        dbms_output.put_line(lastlog.posizione);
+
+    if( :new.daposizione <> lastlog.posizione) then
+        raise NoInsert;
+    end if;
+end if;
+exception
+when noinsert then  RAISE_APPLICATION_ERROR(-20004, 'ERRORE, IMPOSSIBILE');
+
+
+end ;
+/
+create or replace TRIGGER CreaLog
+BEFORE INSERT ON  MOSSA
+FOR EACH ROW
+
+Follows Check_Proprietario
+DECLARE 
+NoInsert Exception;
+NumMosse integer;
+LastTurno Mossa%RowType;
+Lastlog  logpartecipante%rowtype;
+Lastlog2 logpartecipante%rowtype;
+SommaDado Integer;
+DoppioDado integer;
+Conteggio integer;
+exturno integer;
+maxord integer;
+LogEsistente INTEGER;
+Begin
+  lastturno.dado1:=0;
+  lastturno.dado2:=0;
+   lastlog.turno:=0;
+    lastturno.sezione:=0;
+    Conteggio:=0;
+    LogEsistente:=0;
+--Dopo aver seguito una mossa ne creiamo subito il primo log per salvare le modifiche allo stato della pedina
+    Select Count(*) into LogEsistente
+    From LogPartecipante
+    Where :new.pedina=pedina and :new.idpartita1=IdPartita and turno=:new.turno;
+   
+	--Controlliamo che l'utente abbia gia' eseguito delle transazioni del turno
+  if( :new.sezione <> 0 or LogEsistente<>0 ) then
+  Select Count(*) into NumMosse
+  From Mossa
+  Where :new.pedina=pedina and :new.idpartita1=IdPartita1 and turno=:new.turno;
+  else nummosse:=0;
+  end if;
+
+	--Controlliamo per quale delle due condizioni ci troviamo nell'if
+    if ( :new.sezione <>0 ) then
+        
+    Select * into LastTurno
+    From Mossa m1
+    Where :new.pedina=m1.pedina and :new.idpartita1=m1.IdPartita1 and m1.turno=:new.turno and m1.sezione = ( Select max(m2.sezione)
+                                                                                                          from Mossa m2
+                                                                                                          where :new.pedina=m2.pedina and :new.idpartita1=m1.IdPartita1 and m1.turno=:new.turno and m2.pedina=m1.pedina and m1.turno=m2.turno and m1.idpartita1=m2.idpartita1);
+	--Contiamo le mosse eseguite dall'ultima pedina
+    Select count( *) into Conteggio
+    From Mossa m1
+    Where :new.pedina=m1.pedina and :new.idpartita1=m1.IdPartita1 and m1.turno=:new.turno and m1.sezione = ( Select max(m2.sezione)
+                                                                                                          from Mossa m2
+                                                                                                            where :new.pedina=m2.pedina and :new.idpartita1=m1.IdPartita1 and m1.turno=:new.turno and m2.pedina=m1.pedina and m1.turno=m2.turno and m1.idpartita1=m2.idpartita1);
+    end if;
+
+
+   if(NumMosse<>0 and :new.turno <>0 or LogEsistente<>0 ) then   
+	         --Recuperiamo l'ultimo log della pedina e controlliamo se ha fatto un dado doppio e se questa mossa e' legale
+
+         select * INTO lastlog
+         from  logpartecipante 
+         where :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno and ordine in (select max(ordine)
+                                                                                                    from logpartecipante
+                                                                                                    where  :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno);
+                sommadado:= lastturno.dado1+lastturno.dado2;
+                doppiodado:= lastturno.dado1 * 2;
+     
+
+
+      if  ((sommadado != doppiodado) and  :new.turno>0 ) then 
+               
+              raise NoInsert;
+       else 
+             if( :new.sezione <> 0 or LogEsistente<>0  ) then
+                 if ( lastturno.sezione = 1 and :new.dado1 = :new.dado2 and lastlog.turno<>0) then
+                    insert into logpartecipante values(  lastlog.saldo , lastlog.numcontratti , lastlog.turno , 10 , lastlog.pedina , lastlog.idpartita , lastlog.ordine +1 , 1);
+                 else if( lastTurno.sezione<=1 or lastlog.turno = 0) then
+                          
+                           if( :new.aposizione<> 10 ) then
+                              
+                                insert into logpartecipante values(  lastlog.saldo , lastlog.numcontratti , lastlog.turno , :new.aposizione , lastlog.pedina , lastlog.idpartita , lastlog.ordine + 1 , 0);
+                            else  insert into logpartecipante values(  lastlog.saldo , lastlog.numcontratti , lastlog.turno , :new.aposizione , lastlog.pedina , lastlog.idpartita , lastlog.ordine + 1 , 1); end if;
+
+                       else   raise NoInsert;
+                      end if;
+                end if;            
+             end if;
+      end if;
+    else  if( Conteggio = 0) then
+            exturno:=:New.turno-1;
+	--Se questa e' la prima mossa eseguita in questo turno il Conteggio risultera' 0
+            maxord:=0;
+            
+            select max(ordine) into maxord
+             from logpartecipante
+             where  :new.idpartita1=idpartita and pedina=:new.pedina and exturno=turno;
+
+
+            select * INTO lastlog2
+            from  logpartecipante 
+            where :new.idpartita1=idpartita and pedina=:new.pedina and exturno=turno and ordine = maxord;
+          
+            if( :new.aposizione = 10 and lastlog2.inprigione=1) then
+                 insert into logpartecipante values(  lastlog2.saldo , lastlog2.numcontratti , :new.turno , :new.aposizione , lastlog2.pedina , lastlog2.idpartita , 0 , 1);
+            else insert into logpartecipante values(  lastlog2.saldo , lastlog2.numcontratti , :new.turno , :new.aposizione , lastlog2.pedina , lastlog2.idpartita , 0 , 0);
+            end if;
+          end if;
+    end if;
+
+    EXCEPTION
+      WHEN NoInsert then  RAISE_APPLICATION_ERROR(-20004, 'ERRORE, IMPOSSIBILE');
+    END;
+/
+create or replace TRIGGER DadoDoppio1
+BEFORE INSERT ON MOSSA
+FOR EACH ROW
+declare
+PRAGMA AUTONOMOUS_TRANSACTION;
+lastmossa mossa%rowtype;
+Noninserire  exception;
+maxturno integer;
+lastprigioniero logpartecipante%rowtype;
+contoprig integer;
+begin
+--Se una pedina esegue dado doppio non puo' seguire una mossa di un altra pedina
+if( :new.turno > 0 ) then
+Dbms_Output.Put_Line('Maggiore di 0');
+    select max(turno) into maxturno
+     from mossa;
+Dbms_Output.Put_Line('conto mossa diverso da 0');
+   for I in( select *
+            from mossa)
+    loop
+        lastmossa:=i;
+    end loop;
+
+if(lastmossa.pedina <> :new.pedina And lastmossa.turno<>0) then
+       dbms_output.put_line('ora non trovo i dati' );
+        select count(*)into  contoprig
+        from Logpartecipante
+        where  lastmossa.pedina=pedina and lastmossa.daposizione=posizione and lastmossa.idpartita1=idpartita and lastmossa.turno-1=turno and  ordine =( select max(ordine)
+                                                                                                                                                         from logpartecipante
+                                                                                                                                                  where lastmossa.pedina=pedina and lastmossa.daposizione=posizione and lastmossa.idpartita1=idpartita and lastmossa.turno-1=turno);
+
+       if ( contoprig <> 0 ) then
+                 select * into  lastprigioniero
+                from Logpartecipante
+                where  lastmossa.pedina=pedina and lastmossa.daposizione=posizione and lastmossa.idpartita1=idpartita and lastmossa.turno-1=turno and  ordine =( select max(ordine)
+                                                                                                                                                         from logpartecipante
+                                                                                                                                                         where lastmossa.pedina=pedina and lastmossa.daposizione=posizione and lastmossa.idpartita1=idpartita and lastmossa.turno-1=turno);
+
+                 if( lastmossa.dado1 = lastmossa.dado2 and lastprigioniero.inprigione=0) then
+                    raise NonInserire;
+                  end if;
+        end if;
+end if;
+end if;
+Commit;
+Exception
+when NonInserire then RAISE_APPLICATION_ERROR(-20004,'Nell ultima mossa è risultato dado doppio, è necessarioche la pedina precedente ritiri i dadi.');
+
+end;
+/
+create or replace TRIGGER "ELIMINAZIONE1" 
+    After Update on Contratti
+   
+    For each row
+ 
+    Declare
+    NumContratti Integer;
+    loser exception;
+    maxturno integer;
+    lastlog logpartecipante%rowtype;
+
+    Begin
+       --Controlliamo che l'utente abbia un minimo numero di contratti altrimenti e' eliminato
+        select max(turno) into maxturno
+        from logpartecipante
+        where :new.idpartita=idpartita and :new.pedina=pedina;
+    if( maxturno >0) then
+        select * INTO lastlog
+        from  logpartecipante 
+        where :new.idpartita1=idpartita and pedina=:new.pedina and maxturno=turno and ordine in (select max(ordine)
+                                                                                               from logpartecipante
+                                                                                                where  :new.idpartita1=idpartita and pedina=:new.pedina and maxturno=turno);
+        if ( lastlog.NumContratti=0) then
+            raise loser;
+        end if;
+    end if;
+    Exception
+    when loser then
+         RAISE_APPLICATION_ERROR(-20004, 'La pedina e stata eliminata perche ha perso tutti i suoi possedimenti');
+    end;
+/
+create or replace Trigger EscapePrison
+After Insert on LogPartecipante
+for each row 
+declare  
+CartaProb integer;
+CartaImp Integer;
+PRAGMA AUTONOMOUS_TRANSACTION;
+begin
+ 	--Controlliamo se l'utente in prigione e' dotato della carta Esci Di prigione, in quel caso sara' scarcercato subito
+    if( :new.inprigione =1) then 
+
+        select count(*) into cartaProb
+        from carta
+        where idpartita=:new.idpartita and pedina=:new.pedina and numerocarta=7 and ImpOprob='Probabilita';
+
+        select count(*) into cartaImp
+        from carta
+        where idpartita=:new.idpartita and pedina=:new.pedina and numerocarta=7 and ImpOprob='Imprevisti';
+	--Dopo aver controllato se possedesse una delle carta
+
+    if( CartaProb <> 0  ) then
+            insert into logpartecipante values( :new.saldo , :new.numcontratti , :new.turno , :new.posizione , :new.pedina , :new.idpartita , :new.ordine +1 , 0);
+         
+         update carta
+         set pedina=NULL, idpartitaped=NULL
+         where idpartita=:new.idpartita and pedina=:new.pedina and numerocarta=7 and ImpOProb='Probabilita';
+	--Rimozione della carta dal giocatore	    
+       Commit;
+    else 
+         if ( cartaImp <>0 ) then
+                  
+                    insert into logpartecipante values( :new.saldo , :new.numcontratti , :new.turno , :new.posizione , :new.pedina , :new.idpartita , :new.ordine +1 , 0);
+                        dbms_output.put_line('Ho rimosso inprigione');
+
+                            update carta
+                            set pedina=NULL, Idpartitaped=NULL
+                           where idpartita=:new.idpartita  and ImpOProb='Imprevisti';    
+                         Commit;
+				--Rimozione della carta dal giocatore	
+ 
+
+         end if;
+   end if;
+   end if;
+Commit;
+end ;
+
+/
+
+
+create or replace TRIGGER ImpMossa 
+ Before INSERT ON Mossa
+ 
+ FOR EACH ROW  
+   DECLARE
+    Elim Integer;
+    NotAct exception;
+   BEGIN
+	if ( :new.turno <>0 ) then
+    	--Controlliamo se il giocatore che tenta di eseguire la mossa e' stato gia' eliminato
+	SELECT Eliminato into Elim
+	FROM  Partecipante P
+	WHERE P.Pedina= :new.Pedina AND :new.IDpartita1=P.IDPartita;
+	IF ( Elim>=1 ) THEN
+            Raise NotAct;
+    End If;
+   end if;
+   Exception 
+	WHEN NotAct THEN 
+                        RAISE_APPLICATION_ERROR(-20004, 'Impossibile eseguire nuove mosse, giocatore eliminato');
+    END;
+
+/
+create or replace TRIGGER ImpPossessoCarta 
+ Before INSERT ON Carta
+ FOR EACH ROW  
+   DECLARE
+    Elim Integer;
+    NotAct exception;
+   BEGIN
+	--Se il giocatore e' eliminato non puo' avere carte
+	SELECT Count(Eliminato) into Elim
+	FROM  Partecipante P
+	WHERE P.Pedina= :new.Pedina AND :new.IDpartita=P.IDPartita and p.Eliminato=1;
+    IF ( Elim= 1 ) THEN
+            Raise NotAct;
+    End If;
+
+   Exception 
+   When NotAct then
+        dbms_output.put_line('Impossibile eseguire nuove mosse, giocatore eliminato');
+    END;
+/
+create or replace Trigger IniziaPartita
+ After Insert on Partecipante
+ For each row
+ declare
+ numgiocatori partita.numerogiocatori%type;
+ begin
+	--Quando inseriamo un partecipante inseriamo un log di default con il Saldo Base rispetto ai giocatori presenti
+
+ select numerogiocatori into numgiocatori
+ from partita
+ where idpartita=:new.idpartita;
+
+ numgiocatori:=numgiocatori-2;
+   insert into logpartecipante values ( 8750 -( 1250 * numgiocatori) ,0 , -1 , 0,
+    :new.pedina , :new.idpartita , 0 , 0); 
+end ;
+
+/
+create or replace TRIGGER Ipotec 
+  BEFORE INSERT ON Costruisce 
+  FOR EACH ROW 
+    DECLARE 
+      CountC INTEGER;
+      Colour Contratti.Colore%TYPE;
+      NotBuild EXCEPTION;
+    BEGIN
+      --Se si cerca di costruire una casa bisogna avere prima tutti contratti di quel colore
+	IF (:new.IDed= 'Casa') THEN 
+		SELECT COUNT(*) As Conto INTO CountC
+		FROM Contratti  Con
+		WHERE Con.Colore IN (SELECT Colore
+                              FROM Contratti 
+                              WHERE :new.NomeContratto= Nome AND :new.IDPartita=IDPartita) AND Con.Pedina=NULL;
+	END IF;
+	IF (CountC <> 0) THEN 
+		
+		RAISE NotBuild;
+	END IF;
+  EXCEPTION 
+WHEN NotBuild THEN RAISE_APPLICATION_ERROR(-20004, 'Impossibile costruire mancano alcuni contratti');
+END;
+
+/
+
+create or replace trigger Max1Albergo
+before insert on Costruisce
+for each row
+declare
+conto1 integer;
+NotBuild exception;
+begin
+if(:new.ided='Albergo') then
+select count(*) into conto1
+from  costruisce
+where nomecontratto=:new.nomecontratto and idpartita=:new.idpartita and  Ided='Albergo';
+dbms_output.put_line('Questo e conto' || conto1);
+if( conto1 >=1 ) then
+        raise NotBuild;
+end if;
+end if;
+EXCEPTION
+		WHEN NotBuild THEN 
+                        RAISE_APPLICATION_ERROR(-20004, 'Numero massimo di alberghi raggiunto, non piu di 1');
+	END;
+
+/
+create or replace trigger Max4Case
+before insert on Costruisce
+for each row
+declare
+conto1 integer;
+NotBuild exception;
+begin
+if ( :new.ided='Casa' ) then
+select count(*) into conto1
+from  costruisce
+where nomecontratto=:new.nomecontratto and idpartita=:new.idpartita and ided='Casa';
+
+if( conto1 >=4 ) then
+        raise NotBuild;
+end if;
+end if;
+EXCEPTION
+		WHEN NotBuild THEN 
+                        RAISE_APPLICATION_ERROR(-20004, 'Numero massimo di case raggiunto, non piu di 4');
+	END;
+
+/
+create or replace trigger Maxturno1
+Before insert on Turno
+For each row
+Declare
+InvalidTurno Exception;
+TurnoMassimo Integer;
+Begin 
+    Select NumeroTurni into TurnoMassimo
+    From partita 
+    where idpartita = :new.idpartita;
+
+    if( :new.numero > TurnoMassimo) then 
+        raise invalidturno;
+    end if;
+
+    exception 
+        when invalidturno then RAISE_APPLICATION_ERROR(-20004, 'Turno non valido');
+
+    end ;
+
+/
+create or replace trigger Paga_Edifici
+ after insert on costruisce
+ for each row
+ declare
+posizione1 integer;
+pedina1 contratti.pedina%type;
+conto1 integer;
+maxordine integer;
+maxturno integer;
+NoInsert exception;
+dapay integer;
+lastlog logpartecipante%rowtype;
+begin
+--Costruire un edificio costa il prezzo indicata sulla carta dei contratti
+--Calcoliamo la posizione del contratto
+select   posizione into posizione1
+from contratti
+where :new.nomecontratto=nome and :new.idpartita=idpartita;
+--Recuperiamo l'ultimo log della pedina
+select  pedina into pedina1
+from contratti
+where :new.nomecontratto=nome and :new.idpartita=idpartita;
+
+select max(turno) into maxturno
+from logpartecipante
+where idpartita=:new.idpartita and pedina=pedina1;
+
+select max(ordine) into maxordine
+from logpartecipante
+where idpartita=:new.idpartita and pedina=pedina1 and turno=maxturno;
+
+select * into lastlog
+from Logpartecipante
+where idpartita=:new.idpartita and pedina=pedina1 and turno=maxturno and maxordine=ordine and posizione=posizione1;
+
+
+select prezzolavori into dapay
+from contratti
+where :new.nomecontratto=nome and :new.idpartita=idpartita;
+--Inseriamo il nuovo log del partecipante nel quale ha pagato il prezzo dei lavori
+insert into logpartecipante values ( lastlog.saldo-dapay , lastlog.numcontratti , lastlog.turno , lastlog.posizione, lastlog.pedina , lastlog.idpartita , lastlog.ordine +1, lastlog.inprigione);
+
+end;
+/
+create or replace Trigger PassaDalVia
+After Insert on Mossa
+For each row
+Declare
+lastlog logpartecipante%rowtype;
+Begin
+--Se si passa dal via si guadagna 500, viene controllato dall'equazione nell'if
+if ( (:new.daposizione + :new.dado1 + :new.dado2) >=40 ) then
+          select * INTO lastlog
+                        from  logpartecipante 
+                        where :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno and ordine in (select max(ordine)
+                                                                                                                    from logpartecipante
+                                                                                                                    where  :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno);
+    insert into logpartecipante values( lastlog.saldo + 500 , lastlog.numcontratti , lastlog.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita , lastlog.ordine+1 , lastlog.inprigione);
+end if;
+end ;
+
+/
+create or replace TRIGGER Posizione_Costruzione
+Before insert on Costruisce
+for each row
+declare
+posizione1 integer;
+pedina1 contratti.pedina%type;
+conto1 integer;
+maxordine integer;
+maxturno integer;
+NoInsert exception;
+begin
+--Per costruire una casa la pedina deve trovarsi in quella posizione
+select   posizione into posizione1
+from contratti
+where :new.nomecontratto=nome and :new.idpartita=idpartita;
+
+select  pedina into pedina1
+from contratti
+where :new.nomecontratto=nome and :new.idpartita=idpartita;
+
+select max(turno) into maxturno
+from logpartecipante
+where idpartita=:new.idpartita and pedina=pedina1;
+
+select max(ordine) into maxordine
+from logpartecipante
+where idpartita=:new.idpartita and pedina=pedina1 and turno=maxturno;
+
+select count(*) into conto1
+from Logpartecipante
+where idpartita=:new.idpartita and pedina=pedina1 and turno=maxturno and maxordine=ordine and posizione=posizione1;
+
+
+if( conto1 = 0 ) then
+        Raise NoInsert;
+end if;
+
+Exception
+      When NoInsert Then
+        RAISE_APPLICATION_ERROR(-20004, 'ERRORE, IMPOSSIBILE');
+end;
+/
+create or replace Trigger Prigioniero
+Before Insert on Mossa
+for each row
+declare
+ contoprigione integer;
+ lastlog logpartecipante%rowtype;
+ NotInsert exception;
+ begin 
+	--Controlliamo se l'utente una volta in prigione, rispetto al risultato dei dadi vi restera' oppure potra' eseguira la mossa normalmente
+        if( :new.turno<>0) then
+      dbms_output.put_line('Problema nel logpartecipante');
+       select * INTO lastlog
+                        from  logpartecipante 
+                        where :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno-1=turno and ordine in (select max(ordine)
+                                                                                                                    from logpartecipante
+                                                                                                                    where  :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno-1=turno);
+     dbms_output.put_line('Non era il problema');
+     if(lastlog.inprigione=1) then
+          if( :new.dado1 <> :new.dado2 and :new.turno -3 < lastlog.turno) then
+                if( :new.Daposizione<> :new.Aposizione and :new.Aposizione<>10) then
+                        raise NotInsert;
+                end if;
+         else 
+                    if(:new.dado1 <> :new.dado2  and :new.turno -3 = lastlog.turno) then
+                            update logpartecipante  
+                            set saldo= saldo -125 , inprigione=0
+                            where :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno and ordine = (select max(ordine)
+                                                                                                                    from logpartecipante
+                                                                                                                     where  :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno);
+                    else
+                            update logpartecipante  
+                            set  inprigione=0
+                            where :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno and ordine = (select max(ordine)
+                                                                                                                    from logpartecipante
+                                                                                                                     where  :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno);
+                     end if;
+        end if;
+    end if;
+end if;
+ end;
+
+
+/
+create or replace TRIGGER RS 
+	BEFORE INSERT ON Rendita
+	FOR EACH ROW 
+	DECLARE 
+		
+		NotAddS EXCEPTION;
+		NotAddSS EXCEPTION;
+		Conto1  Integer;
+		Conto2  Integer;
+BEGIN
+    Conto1:=0;
+    Conto2:=0;
+
+	--Blocca l'inserimento di piu' rendite rispetto a quante un contratto ne abbia davvero 
+	--Controlla il tipo si contratto di cui si inserisce la rendita e verifica che non si stia inserendo un numero maggiore di quanto dovuto
+
+				  SELECT Count(Nome) as Conto Into Conto1
+                  FROM Contratti
+				  WHERE Tipo= 'Societa' And Nome=:New.NomeContratto and IdPartita=:new.IdPartita;
+
+		If(Conto1 <> 0 ) THEN 
+
+		     IF :new.numrendita >= 2 THEN
+			      RAISE NotAddS;
+		     END IF;
+        END IF;
+
+			SELECT Count(Nome) as Conto Into Conto2
+					FROM Contratti
+					WHERE Tipo= 'Stazione' And Nome=:New.NomeContratto and IdPartita=:new.IdPartita;
+			If( Conto2 <> 0) then
+
+			  IF (:new.numrendita >= 4) THEN
+			      RAISE NotAddSS;
+			   END IF;
+		    END IF;
+
+	EXCEPTION
+		WHEN NotAddS THEN 
+RAISE_APPLICATION_ERROR(-20004, 'Per questo tipo di contratto non possono esserci piu di due rendite');
+		WHEN NotAddSS THEN 
+RAISE_APPLICATION_ERROR(-20004, 'Per questo tipo di contratto non possono esserci piu di quattro rendite');
+	END;
+
+
+
+
+/
+create or replace Trigger TrovarsiSpecial
+After Insert on Mossa
+
+For each row
+Follows PassaDalVia
+Declare 
+ContoSpec Integer;
+TipoS speciale.tipospecial%type;
+Exlog logpartecipante%rowtype;
+Denaro1 speciale.denaro%type;
+Pescato Integer;
+Invalid integer;
+TempCarta Carta%RowType;
+Presente Integer;
+lastlog logpartecipante%rowtype;
+numgiocatori integer;
+CountCase Integer;
+CountAlbergo Integer;
+contorapido integer;
+Begin
+   if ( :new.turno <>0) then
+    invalid:=1;
+   
+    if(:new.posizionespec is not NULL ) then
+  		--Controllo che l'utente si torvi effettivamente in una casella speciale e controllo successivamente il suo tipo cosi' da verificare l'evento da eseguire
+        select tipospecial into tipos
+        from  speciale s
+        where :new.IDPARTITA1=s.IDPARTITA  and :new.posizionespec=s.posizione  ;
+        dbms_output.put_Line('posiz not null');
+        select l.saldo , l.numcontratti , l.turno , l.posizione , l.pedina , l.idpartita , l.ordine , l.inprigione into exlog
+        from  logpartecipante l
+        where l.idpartita=:new.idpartita1 and :new.pedina=l.pedina  
+             and :new.turno=l.turno   and l.ordine in ( select max(l2.ordine)
+                                                          from logpartecipante l2
+                                                           where :new.pedina=l2.pedina and :new.idpartita1=l2.idpartita and l2.turno=:new.turno);
+        dbms_output.put_Line('posiz not null');
+        if( tipos= 'Via' ) then
+            insert into logpartecipante values ( exlog.saldo + 500 , exlog.numcontratti ,  exlog.turno , exlog.posizione ,exlog.pedina , exlog.idpartita , exlog.ordine +1 , exlog.inprigione );   
+        end if ;    
+            if ( tipos='TassaPatrimoniale' or tipos='TassaDelLusso') then
+                    select denaro into denaro1
+                    from speciale
+                    where :new.posizionespec=posizione and  :new.idpartita1=idpartita;
+
+                  insert into logpartecipante values ( exlog.saldo - denaro1 , exlog.numcontratti ,  exlog.turno , exlog.posizione ,exlog.pedina , exlog.idpartita , exlog.ordine+1 , exlog.inprigione);  
+
+             end if;
+
+          if ( tipos='Prigione' ) then
+                
+                insert into logpartecipante values ( exlog.saldo , exlog.numcontratti , exlog.turno , 10 , exlog.pedina , exlog.idpartita , exlog.ordine+1 , 1);
+            end if;
+
+
+
+        if( tipos = 'Imprevisti' or tipos='Probabilita') then
+           --Verificato che si sia pescata la carta se ne recuperano le generalita' e si verifica il suo numero carta
+           select c.DESCRIZIONE ,c.NUMEROCARTA ,c.DENARO ,c.IMPOPROB ,c.POSSEDIBILE ,c.PEDINA ,c.IDPARTITAPED ,c.IDPARTITA ,c.PAGO ,c.RICEVO ,c.DESTINAZIONE  into tempcarta
+           from   carta c
+           where :new.descrizionecarta=c.descrizione and :new.idpartita1=c.idpartita;
+
+
+          insert into turno values(:new.posizionespec , :new.idpartita1 , tempcarta.descrizione ,    :new.turno , tempcarta.idpartita);
+
+          if( tempcarta.possedibile = 0) then
+                    select * INTO lastlog
+                    from  logpartecipante 
+                    where :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno and ordine in (select max(ordine)
+                                                                                                                from logpartecipante
+                                                                                                                where  :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno);
+                     
+                     if ( tempcarta.denaro IS NOT NULL) then
+                            
+                            if( tempcarta.ImpOProb = 'Probabilita' and tempcarta.numerocarta=1) then
+                                           
+                                            select count(distinct pedina) into numgiocatori
+                                            from logpartecipante l1
+                                            where l1.idpartita=:new.idpartita1 and l1.NumContratti <>0 and (:new.turno=l1.turno or( :new.turno= l1.turno +1 and NOT Exists 
+                                            ( Select *
+                                             from logpartecipante l2
+                                             where idpartita=:new.idpartita1 and  :new.turno=l2.turno and l1.pedina=l2.pedina)) ) and l1.ordine In ( select max(ordine)
+                                                                                                                                                 from logpartecipante l3
+                                                                                                                                                 where idpartita=:new.idpartita1 and l1.pedina=l3.pedina and (l3.turno=l1.turno));
+
+                                                       
+                                            insert into logpartecipante values ( lastlog.saldo + (25 * (numgiocatori-1)) , lastlog.numcontratti , lastlog.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita
+                                            , lastlog.ordine +1 , lastlog.inprigione);
+
+                                   
+
+                                            for tempedina in ( select pedina
+                                                                from  partecipante p1
+                                                                    where  NOT(eliminato=1) and  p1.pedina<>:new.pedina  and idpartita=:new.idpartita1 ) 
+                                                loop
+                                              
+                                                        
+                                                    select count(*) into contorapido
+                                                    from logpartecipante l1
+                                                    where idpartita=:new.idpartita1 and  :new.turno=l1.turno and l1.pedina=tempedina.pedina and l1.ordine In ( select max(ordine)
+                                                                                                                                                                from logpartecipante l3
+                                                                                                                                                                where idpartita=:new.idpartita1 and l3.pedina=tempedina.pedina and l3.turno=:new.turno);
+
+                                                    if ( contorapido <> 0 ) then
+
+                                                        dbms_output.put_Line('Primo if');
+                                                        select * into lastlog
+                                                        from logpartecipante l1
+                                                        where idpartita=:new.idpartita1 and  :new.turno=l1.turno and l1.pedina=tempedina.pedina and l1.ordine In ( select max(ordine)
+                                                                                                                                                                    from logpartecipante l3
+                                                                                                                                                                    where idpartita=:new.idpartita1 and l3.pedina=tempedina.pedina and l3.turno=:new.turno);
+                                                        
+                                                        insert into logpartecipante values( lastlog.saldo-25,     lastlog.numcontratti ,  lastlog.turno , lastlog.posizione ,   lastlog.pedina, lastlog.idpartita, lastlog.ordine+1, lastlog.inprigione);
+                                                    else
+                                                    
+                                                        select * INTO lastlog
+                                                        from  logpartecipante 
+                                                        where :new.idpartita1=idpartita and pedina=tempedina.pedina and :new.turno-1=turno and ordine in (select max(ordine)
+                                                                                                                                                            from logpartecipante
+                                                                                                                                                            where  :new.idpartita1=idpartita and pedina=tempedina.pedina and :new.turno-1=turno);
+                                                        insert into logpartecipante values( lastlog.saldo-25,     lastlog.numcontratti ,  lastlog.turno , lastlog.posizione ,   lastlog.pedina, lastlog.idpartita, lastlog.ordine+1, lastlog.inprigione);
+
+                                                    END IF; 
+
+                                                END LOOP;            
+                                       
+                                            else 
+                                                if ( (tempcarta.numerocarta=1 or tempcarta.numerocarta=2) and tempcarta.ImpOProb='Imprevisti') then
+                                                    Select Count(*) into CountCase
+                                                    from Costruisce C , Contratti  Co
+                                                    where c.IdEd='Casa' and C.IdPartita=:new.Idpartita1 and C.NomeContratto=Co.Nome and Co.Idpartita=:new.IdPartita and :new.Pedina=Co.Pedina;
+
+                                                    Select Count(*) into CountAlbergo
+                                                    from Costruisce C , Contratti  Co
+                                                    where c.IdEd='Casa' and C.IdPartita=:new.Idpartita1 and C.NomeContratto=Co.Nome and Co.Idpartita=:new.IdPartita1 and :new.Pedina=Co.Pedina;
+
+                                                    insert into logpartecipante values( lastlog.saldo-(250 * CountAlbergo) , lastlog.numcontratti, lastlog.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita 
+                                                                                                                 , lastlog.ordine +1 , lastlog .inprigione);
+
+
+                                                    if( tempcarta.numerocarta=1 ) then
+
+                                                         insert into logpartecipante values( lastlog.saldo-(60 * CountCase) , lastlog.numcontratti, lastlog.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita 
+                                                                                           , lastlog.ordine +1 , lastlog .inprigione);
+
+                                                    else        
+                                                        insert into logpartecipante values( lastlog.saldo-(100 * CountCase) , lastlog.numcontratti, lastlog.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita 
+                                                                                           , lastlog.ordine +1 , lastlog .inprigione);
+
+                                                    end if;
+                                                else     
+                                                    if( tempcarta.pago = 0 ) then
+                                                   
+                                                        insert into logpartecipante values ( lastlog.saldo + tempcarta.denaro , lastlog.numcontratti , lastlog.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita
+                                                                                        , lastlog.ordine +1 , lastlog.inprigione);
+    
+
+                                                    else         
+                                                        insert into logpartecipante values ( lastlog.saldo - tempcarta.denaro , lastlog.numcontratti , lastlog.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita
+                                                                                                         , lastlog.ordine +1 , lastlog.inprigione);
+                                                end if;
+                                            End if;
+                                        End if;
+                                    End if;
+                                
+                                    if( tempcarta.Destinazione IS NOT NULL) then
+                                    
+                                        if( tempcarta.numerocarta=3) then
+                                            dbms_output.put_line('Numero carta e 3 deve funzionare per forza');
+                                            insert into logpartecipante values ( lastlog.saldo  , lastlog.numcontratti , lastlog.turno , tempcarta.destinazione , lastlog.pedina , lastlog.idpartita
+                                                                , lastlog.ordine +1 , 1);
+                                        
+                                        else
+
+
+                                            if (tempcarta.ricevo = 0 ) then
+                                            
+                                                if( tempcarta.numerocarta = 4 and tempcarta.ImpOProb = 'Imprevisti' ) then
+                                                  
+                                                    insert into logpartecipante values ( lastlog.saldo  , lastlog.numcontratti , lastlog.turno , lastlog.posizione -3 , lastlog.pedina , lastlog.idpartita
+                                                                        , lastlog.ordine +1 , lastlog.inprigione);
+                                                else  
+                                                                             
+                                                    insert into logpartecipante values ( lastlog.saldo  , lastlog.numcontratti , lastlog.turno , tempcarta.destinazione , lastlog.pedina , lastlog.idpartita
+                                                                        , lastlog.ordine +1 , lastlog.inprigione);
+                                                  
+
+                                                end if;
+
+                                            else  
+                                                if( lastlog.posizione> tempcarta.destinazione  ) then
+                                                  
+                                                    
+                                                    insert into logpartecipante values ( lastlog.saldo  , lastlog.numcontratti , lastlog.turno , tempcarta.destinazione , lastlog.pedina , lastlog.idpartita
+                                                                            , lastlog.ordine +1 , lastlog.inprigione);
+                                                else 
+                                                  
+                                                    insert into logpartecipante values ( lastlog.saldo + 500 , lastlog.numcontratti , lastlog.turno , tempcarta.destinazione , lastlog.pedina , lastlog.idpartita
+                                                                            , lastlog.ordine +1 , lastlog.inprigione);                                    
+                                                end if;   
+                                            end if;
+                                        end if;
+                                    end if;
+                                end if;
+
+                                if ( tempcarta.numerocarta = 7 ) then
+                                    update  carta
+                                    set pedina=:new.pedina , Idpartitaped=:new.Idpartita1
+                                    where numerocarta=tempcarta.numerocarta and ImpOProb = tempcarta.impOProb and IdPartita=:new.Idpartita1 and Descrizione=tempcarta.Descrizione;
+
+                                end if;      
+                            end if;
+                        end if;
+                    end if;
+            
+END ;
+/
+create or replace TRIGGER  VincLavoriAlbergo
+  BEFORE INSERT ON Costruisce
+  FOR EACH ROW
+  DECLARE 
+    CountAlbergo INTEGER;
+    CountCasa INTEGER;
+    CaseRestanti INTEGER;
+    NotBuild EXCEPTION;
+  BEGIN 
+	--Controllo che ci siano abbastanza case per poter costruire un albergo
+    IF (:new.IDed='Albergo') THEN 
+	SELECT COUNT(*) INTO CountCasa
+	FROM Costruisce
+	WHERE :new.NomeContratto=NomeContratto AND IDed='Casa' AND :new.IDPartita=IDPartita;
+             SELECT COUNT(*) INTO CountAlbergo
+	FROM Costruisce
+	WHERE :new.NomeContratto=NomeContratto AND IDed='Albergo' AND :new.IDPartita=IDPartita;
+    END IF;
+   IF ((CountCasa - (CountAlbergo * 4)) < 4) THEN 
+	RAISE  NotBuild;
+   END IF;
+  Exception
+	WHEN NotBuild THEN 
+	Dbms_output.put_line('Costruisci altre ( ');
+		CaseRestanti:= 4- CountCasa-(CountAlbergo*4);
+     Dbms_output.put_line(CaseRestanti ||') case');
+     RAISE_APPLICATION_ERROR(-20004, '');
+END;
+
+/
+create or replace TRIGGER vincLavoriCase 
+BEFORE INSERT ON Costruisce
+FOR EACH ROW 
+DECLARE 
+	CountC INTEGER;
+    BEGIN
+     IF (:new.IDed='Casa') THEN 
+		SELECT COUNT(*) As Conto INTO CountC
+		FROM Contratti Con
+		WHERE Con.Colore IN (SELECT Colore
+                            FROM Contratti 
+                            WHERE :new.NomeContratto= Nome AND :new.IDPartita=IDPartita)
+        GROUP BY Con.Pedina;
+    END IF;
+
+    EXCEPTION
+		 WHEN TOO_MANY_ROWS THEN                  
+
+        Dbms_output.put_line('Si consiglia al giocatore di impossessarsi di tutti I contratti di quel colore.');
+                           FOR NomePedina IN (SELECT Distinct Pedina 
+                                                    FROM Contratti Con
+                                                    WHERE Con.Colore IN (SELECT Colore
+                                                                         FROM Contratti 	
+                                                                         WHERE :new.NomeContratto= Nome AND :new.IDPartita=IDPartita ))
+                                LOOP
+                                     dbms_output.put_line(NomePedina.Pedina ||' ');
+                                END LOOP;
+                            RAISE_APPLICATION_ERROR(-20004, '');
+
+
+        END;
+/
+create or replace trigger check_proprietario
+before insert on Mossa
+for each row
+follows Consistenza
+declare
+contr integer;
+Noinsert exception;
+begin
+--Si controlla se nel caso di un acquisto, il terreno indicato non appartenga ad altri
+if ( :new.turno >0 ) then
+    if( :new.tipomossa =1) then
+        
+        select count(*) into contr
+        from contratti
+        where :new.idpartitaacq=Idpartita and acquistata=1 and nome=:new.nomecontrattoacq and posizione=:new.aposizione;
+        if ( contr <> 0 ) then
+            Raise NoInsert;
+        end if;
+    end if;
+end if;
+exception
+    when noinsert then  RAISE_APPLICATION_ERROR(-20004, 'ERRORE, IMPOSSIBILE');
+end;
+/
+create or replace Trigger AddAcquisto
+Before Insert on Mossa
+For each row
+follows CREALOG
+
+declare
+    PrezzoDapay number(8,2);
+    lastlog logpartecipante%rowtype;
+    contoPoss integer;
+    possessore contratti.pedina%type;
+    NoBuy exception;
+begin
+	--Se l'acquisto da parte di una pedina di un contratto e' legale, sottraiamo il costo del terreno dall'ultimo log della pedina
+    if ( :new.tipomossa = 1) then
+        select pedina into possessore
+        from contratti
+        where idpartita=:new.idpartita1 and  :new.nomecontrattoacq=nome;
+
+        select count(pedina) into contoposs
+        from contratti
+        where idpartita=:new.idpartita1 and  :new.nomecontrattoacq=nome;
+
+        if( contoposs=0) then 
+            select prezzo into prezzodapay
+            from  contratti
+            where idpartita=:new.idpartita1 and  :new.nomecontrattoacq=nome;
+
+            select * INTO lastlog
+            from  logpartecipante 
+            where :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno and ordine in (select max(ordine)
+                                                                                                        from logpartecipante
+                                                                                                        where  :new.idpartita1=idpartita and pedina=:new.pedina and :new.turno=turno);
+
+            dbms_output.put_line( 'Prima di LstLOg');
+            if( :new.turno <>0) then
+                insert into logpartecipante values( lastlog.saldo - prezzodapay , lastlog.numcontratti +1 ,   lastlog.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita , lastlog.ordine + 1 , lastlog.inprigione);                                                 
+            else  
+                insert into logpartecipante values( lastlog.saldo  , lastlog.numcontratti +1 ,   lastlog.turno , lastlog.posizione , lastlog.pedina , lastlog.idpartita , lastlog.ordine + 1 , lastlog.inprigione);
+            end if;
+            update contratti set pedina= :new.pedina, idpartita1=:new.idpartita1 , acquistata=1 where idpartita=:new.idpartita1 and  :new.nomecontrattoacq=nome and :new.idpartitaacq=idpartita;
+            dbms_output.put_line('Finito ');
+        else 
+            raise NoBuy;
+        end if;
+
+    end if;
+
+Exception
+    when nobuy then 
+        RAISE_APPLICATION_ERROR(-20004, 'Il Contratto ' || :new.nomecontrattoacq || ' appartiene ad un altro partecipante ');
+END;

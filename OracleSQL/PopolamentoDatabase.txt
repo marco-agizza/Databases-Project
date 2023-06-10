@@ -1,0 +1,1106 @@
+create user Utente identified by 12345;
+grant connect to Utente;
+grant all privileges to Utente;
+
+/
+
+
+
+
+insert  into edilizia values ('Albergo')
+/
+
+
+insert 	into edilizia values ('Casa');
+/
+
+insert into tabellone values( 0 , 16 , 16 );
+/
+insert into giocatore (nome , cognome , username )values('John' , 'Doe' , 'JD' );
+/
+insert into giocatore ( nome , cognome , username )values('Nick' , 'Cage' , 'NoisyC' );
+/
+insert into giocatore ( nome , cognome , username ) values( 'Michael' , 'Scoffield' , '4t0m07' );
+/
+insert into partita values ( 0 , NULL  , 0, 3 ,  systimestamp , null, null);
+/
+insert into partecipante values ( 'Fungo' , 0 , 'JD' , 0 );
+/
+insert into partecipante values ( 'Fiasco' , 0 , '4t0m07' , 0 );
+/
+insert into partecipante values( 'Pera' , 0 , 'NoisyC' , 0);
+/
+ insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'andate sino al largo colombo: se passate dal via ritirate 500 euro.' ,5 , NULL , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 0 , 24 );
+
+/
+
+
+  insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'andate in prigione direttamente e senza passare dal via' ,3 , NULL , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 0 , 10 );
+
+/
+  insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'avete tutti i vostri stabili da riparare: pagare 60 euro per ogni casa e 250 per ogni albergo.' ,1 , 0 , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 0 , NULL );
+/
+
+
+  insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'fate 3 passi indietro (con tanti auguri).' ,4 , NULL , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 0 , NULL );
+
+/
+
+
+  insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'andate sino a via accademia: se passate dal via ritirate 500 euro.' ,14 , NULL , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 0 , 11 );
+
+/
+ insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'versate 50 euro per beneficenza. ' ,6 , 50 , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 1, 0 , NULL );
+
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'Andate sino alla stazione nord : se passate dal via ritirare 500 euro .' ,8 , NULL , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0, 0 , NULL );
+/
+
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'multa di 40 euro per aver guidato senza patente.' ,9, 40 , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 1 , 0 , NULL);
+
+/
+
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'andate fino al parco della vittoria.' ,10, NULL , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 0 , 39);
+
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'matrimonio in famiglia: spese impreviste 375 euro.' ,11, 375 , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 1 , 0 , NULL);
+
+/
+
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'uscite gratis di prigione, se ci siete.' ,7, NULL , 'Imprevisti' 
+  , 1 , NULL , NULL , 0 , 0 , 0 , NULL);
+/
+
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'maturano le cedole delle vostre cartelle di rendita, ritirate 375 euro.' ,12, 375 , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+/
+
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'la banca vi paga gli interessi del vostro conto corrente, ritirate 125 euro.' ,13, 125 , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+/
+
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'Andate avanti sino al via' ,15, NULL , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 0 , 0);
+
+/
+
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'Avete vinto un terno al lotto: ritirate 250 euro.' ,16, 250 , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+
+
+
+
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro ,
+ ImpOProb , Possedibile , Pedina , IdpArtitaPed , IdPartita , Pago , Ricevo , Destinazione)
+ values ( 'dovete pagare 100 per ogni casa, 250 euro per ogni albergo che possedete.
+' ,2, 0 , 'Imprevisti' 
+  , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'pagate una multa di 25 euro, oppure prendete un cartoncino dagli imprevisti.', 5, 0 , 'Probabilita' , 0 , NULL , NULL , 0 , 1 , 0 , NULL);
+
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'ritornate al vicolo corto.' ,2 , NULL , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 0 , 1 );
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'è maturata la cedola delle vostre azioni: ritirate 60 euro.', 4, 60 , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'rimborso tassa sul reddito: ritirate 50 euro dalla banca.', 6, 50 , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'avete vinto il secondo premio in un concorso di bellezza: ritirate 25 euro.', 8, 25 , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'scade il vostro premio di assicurazione: pagate 125 euro.', 9, 125 , 'Probabilita' , 0 , NULL , NULL , 0 , 1 , 0 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'uscite gratis di prigione, se ci siete (puoi conservarlo).', 7, NULL , 'Probabilita' , 1 , NULL , NULL , 0 , 0 , 0 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'avete vinto un premio di consolazione alla lotteria di Merano: ritirate 250 euro.', 10, 250 , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 0 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'andate fino al via.', 11, NULL , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 0 , 0);
+
+
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'siete creditori verso la banca di 500 euro, ritirateli.', 12, 500 , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'avete perso una causa: pagate 250 euro.', 13, 250 , 'Probabilita' , 0 , NULL , NULL , 0 , 1 , 0 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'andate in prigione direttamente e senza passare dal via.', 3, NULL , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 0 , 10);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'è il vostro compleanno: ogni giocatore vi regala 25 euro.', 1, 0 , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'avete ceduto delle azioni: ricavate 125 euro.', 15, 125 , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'pagate il conto del dottore: 125 euro.', 16, 125 , 'Probabilita' , 0 , NULL , NULL , 0 , 1 , 0 , NULL);
+/
+insert into carta ( Descrizione , NumeroCarta , Denaro, ImpOProb, Possedibile, Pedina, IdpartitaPed, IdPartita, Pago, Ricevo, Destinazione) 
+		values ( 'ereditate 250 € da un lontano parente', 14, 250 , 'Probabilita' , 0 , NULL , NULL , 0 , 0 , 1 , NULL);
+
+/
+
+Insert into speciale ( Descrizione , Denaro , TipoSpecial , Posizione , Id_tab , IdPartita ) values (
+		'Posizione di Partenza' , NULL , 'Via' , 0 , 0 , 0);
+/
+
+Insert into speciale ( Descrizione , Denaro , TipoSpecial , Posizione , Id_tab, IdPartita ) values (
+		' É una probabilita' , NULL , 'Probabilita' , 2 , 0 , 0);
+/
+
+Insert into speciale ( Descrizione , Denaro , TipoSpecial , Posizione , Id_tab, IdPartita ) values (
+		'Detrae dal saldo della pedina 500 €' , 500 , 'TassaPatrimoniale' , 4 , 0, 0 );
+/
+
+Insert into speciale ( Descrizione , Denaro , TipoSpecial , Posizione , Id_tab , IdPartita) values (
+		'È un imprevisto' , NULL , 'Imprevisti' , 7, 0 , 0);
+
+/
+
+Insert into speciale ( Descrizione , Denaro , TipoSpecial , Posizione , Id_tab , IdPartita) values (
+		'Prigione' , NULL , 'Prigione' , 10 , 0 , 0);
+/
+
+Insert into speciale ( Descrizione , Denaro , TipoSpecial , Posizione , Id_tab, IdPartita ) values (
+		'Permette la sosta gratuita' , NULL , 'ParcheggioGratuito' , 20 , 0, 0 );
+/
+
+Insert into speciale ( Descrizione , Denaro , TipoSpecial , Posizione , Id_tab, IdPartita ) values (
+		'È una probabilità' , NULL , 'Probabilita' , 17 , 0 , 0);
+/
+insert into Speciale ( Descrizione, Denaro, TipoSpecial, Posizione, ID_Tab,IDPartita)
+	VALUES ('È un imprevisto',NULL, 'Imprevisti', 22, 0, 0);
+/
+insert into Speciale ( Descrizione, Denaro, TipoSpecial, Posizione, ID_Tab,IDPartita)
+	VALUES ('Obbliga la pedina che si ferma su di esso ad andare in prigione', NULL, 'Prigione',30,0,0);
+/
+insert into Speciale ( Descrizione, Denaro, TipoSpecial, Posizione, ID_Tab,IDPartita)
+	VALUES('È una probabilità', NULL, 'Probabilita', 33,0,0);
+/
+insert into Speciale ( Descrizione, Denaro, TipoSpecial, Posizione, ID_Tab,IDPartita)
+	VALUES ('È un imprevisto',NULL,'Imprevisti' ,36,0,0)
+/
+insert into Speciale ( Descrizione, Denaro, TipoSpecial, Posizione, ID_Tab,IDPartita) 
+	VALUES ('Detrae 250€ dal saldo della pedina',250,'TassaDelLusso' , 38 , 0 , 0);
+/
+--CONTRATTI
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 75 , 150 , 0 , 125 , 'Blu' , NULL , 'Vicolo Corto' , 1 , NULL , 0 , NULL , 0)
+/
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 75 , 150 , 0 , 125 , 'Blu' , NULL , 'Vicolo Stretto' , 3 , NULL , 0 , NULL , 0)
+/
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 125 , 250 , 0 , 125 , 'Azzurro' , NULL , 'Bastioni Gran Sasso' , 6 , NULL , 0 , NULL , 0)
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 125 , 250 , 0 , 125 , 'Azzurro' , NULL , 'Viale Monterosa' , 8 , NULL , 0 , NULL , 0)
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 150 , 300 , 0 , 125 , 'Azzurro' , NULL , 'Viale Vesuvio' , 9 , NULL , 0 , NULL , 0)
+
+/
+--GIA INSERITI
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 175 , 350 , 0 , 250 , 'Arancione ' , NULL , 'Via Accademia' , 11 , NULL , 0 , NULL , 0)
+/
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 175 , 350 , 0 , 250 , 'Arancione ' , NULL , 'Corso Ateneo' , 13 , NULL , 0 , NULL , 0)
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 200 , 400 , 0 , 250 , 'Arancione ' , NULL , 'Piazza Università' , 14 , NULL , 0 , NULL , 0)
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 225 , 450 , 0 , 250 , 'Marrone' , NULL , 'Via Verdi' , 16 , NULL , 0 , NULL , 0)
+
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 225 , 450 , 0 , 250 , 'Marrone' , NULL , 'Corso Raffaello' , 18 , NULL , 0 , NULL , 0)
+
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 250 , 500 , 0 , 250 , 'Marrone' , NULL , 'Piazza Dante' , 19 , NULL , 0 , NULL , 0)
+
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 275 , 550 , 0 , 375 , 'Rosso' , NULL , 'Via Marco Polo' , 21 , NULL , 0 , NULL , 0)
+
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 275 , 550 , 0 , 375 , 'Rosso' , NULL , 'Corso Magellano' , 23 , NULL , 0 , NULL , 0)
+
+/
+
+
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 300 , 600, 0 , 375 , 'Rosso' , NULL , 'Largo Colombo' , 24 , NULL , 0 , NULL , 0)
+
+
+
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 325 , 650, 0 , 375 , 'Giallo ' , NULL , 'Viale Costantino' , 26 , NULL , 0 , NULL , 0)
+/
+
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 325 , 650, 0 , 375 , 'Giallo ' , NULL , 'Viale Traiano' , 27 , NULL , 0 , NULL , 0)
+
+/
+
+
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 350 , 700, 0 , 375 , 'Giallo ' , NULL , 'Piazza Giulio Cesare' , 29 , NULL , 0 , NULL , 0)
+
+
+
+/
+
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 375 , 750, 0 , 500 , 'Verde' , NULL , 'Via Roma' , 31 , NULL , 0 , NULL , 0)
+
+/
+
+
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 375 , 750, 0 , 500 , 'Verde' , NULL , 'Corso Impero' , 32 , NULL , 0 , NULL , 0)
+
+
+/
+
+
+
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 400 , 800, 0 , 500 , 'Verde' , NULL , 'Largo Augusto' , 34 , NULL , 0 , NULL , 0)
+
+/
+
+
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 440 , 875, 0 , 500 , 'Viola' , NULL , 'Viale dei Giardini' , 37 , NULL , 0 , NULL , 0)
+/
+
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 500 , 1100, 0 , 500 , 'Viola' , NULL , 'Parco della Vittoria' , 39 , NULL , 0 , NULL , 0)
+/
+-- Società e Servizi
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 250 , 500, 0 , NULL , NULL , 'Stazione' , 'Stazione Sud' , 5 , NULL , 0 , NULL , 0)
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 250 , 500, 0 , NULL , NULL , 'Stazione' , 'Stazione Ovest' , 15 , NULL , 0 , NULL , 0)
+
+/
+
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 250 , 500, 0 , NULL , NULL , 'Stazione' , 'Stazione Nord' , 25 , NULL , 0 , NULL , 0)
+
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 250 , 500, 0 , NULL , NULL , 'Stazione' , 'Stazione Est' , 35, NULL , 0 , NULL , 0)
+
+/
+
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 190 , 375, 0 , NULL , NULL , 'Societa' , 'Società Elettrica' , 12 , NULL , 0 , NULL , 0)
+
+/
+insert into Contratti (ValoreIpotecario , Prezzo , Acquistata , PrezzoLAvori, Colore , Tipo , Nome , 
+	Posizione , Pedina , IdPartita , IdPartita1 , Id_tabellone ) 
+	values ( 190 , 375 , 0 , NULL , NULL , 'Societa' , 'Società Acqua Potabile' , 28 , NULL , 0 , NULL , 0)
+
+/
+--Rendita di ogni Contratto
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 5 , 0 , 'Vicolo Corto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 25, 1 , 'Vicolo Corto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 75 , 2 , 'Vicolo Corto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 225 , 3 , 'Vicolo Corto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 400 , 4 , 'Vicolo Corto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 625 , 5 , 'Vicolo Corto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 10 , 0 , 'Vicolo Stretto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 50 , 1 , 'Vicolo Stretto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 150 , 2, 'Vicolo Stretto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 450 , 3 , 'Vicolo Stretto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 800 , 4 , 'Vicolo Stretto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1125 , 5 , 'Vicolo Stretto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 15 , 0 , 'Bastioni Gran Sasso' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 75 , 1 , 'Bastioni Gran Sasso' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 225 , 2 , 'Bastioni Gran Sasso' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 675 , 3 , 'Bastioni Gran Sasso' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1000 , 4 , 'Bastioni Gran Sasso' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1375 , 5 , 'Bastioni Gran Sasso' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 15 , 0 , 'Viale Monterosa' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 75 , 1 , 'Viale Monterosa' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 225 , 2 , 'Viale Monterosa' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 675 , 3 , 'Viale Monterosa' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1000 , 4 , 'Viale Monterosa' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1375 , 5 , 'Viale Monterosa' , 0)
+/
+
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 20 , 0 , 'Viale Vesuvio' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 100 , 1 , 'Viale Vesuvio' , 0)
+
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 250 , 2 , 'Viale Vesuvio' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 750 , 3 , 'Viale Vesuvio' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1125 , 4 , 'Viale Vesuvio' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1500 , 5 , 'Viale Vesuvio' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 25 , 0 , 'Via Accademia' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 125 , 1 , 'Via Accademia' , 0)
+
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 375 , 2 , 'Via Accademia' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1125 , 3 , 'Via Accademia' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1550 , 4 , 'Via Accademia' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1875 , 5 , 'Via Accademia' , 0)
+/
+
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 25 , 0 , 'Corso Ateneo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 125 , 1 , 'Corso Ateneo' , 0)
+
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 375 , 2 , 'Corso Ateneo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1125 , 3 , 'Corso Ateneo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1550 , 4 , 'Corso Ateneo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1875 , 5 , 'Corso Ateneo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  30, 0 , 'Piazza Università' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 150 , 1, 'Piazza Università' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 450 , 2 , 'Piazza Università' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1250 , 3 , 'Piazza Università' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 1750 , 4 , 'Piazza Università' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values ( 2250 , 5 , 'Piazza Università' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  35, 0 , 'Via Verdi' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  175 , 1 , 'Via Verdi' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  500, 2 , 'Via Verdi' , 0)
+/
+
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1375, 3 , 'Via Verdi' , 0)
+/
+
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1875, 4 , 'Via Verdi' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2375, 5 , 'Via Verdi' , 0)
+/
+
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  35, 0 , 'Corso Raffaello' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  175 , 1 , 'Corso Raffaello' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  500, 2 , 'Corso Raffaello' , 0)
+/
+
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1375, 3 , 'Corso Raffaello' , 0)
+/
+
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1875, 4 , 'Corso Raffaello' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2375, 5 , 'Corso Raffaello' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  40, 0 , 'Piazza Dante' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  200, 1 , 'Piazza Dante' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  550, 2 , 'Piazza Dante' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1500, 3 , 'Piazza Dante' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2000, 4 , 'Piazza Dante' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2500, 5 , 'Piazza Dante' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  45, 0 , 'Via Marco Polo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  225, 1 , 'Via Marco Polo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  625, 2 , 'Via Marco Polo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1750, 3 , 'Via Marco Polo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2200, 4 , 'Via Marco Polo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2750, 5 , 'Via Marco Polo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  45, 0 , 'Corso Magellano' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  225, 1 , 'Corso Magellano' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  625, 2 , 'Corso Magellano' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1750, 3 , 'Corso Magellano' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2200, 4 , 'Corso Magellano' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2750, 5 , 'Corso Magellano' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  50, 0 , 'Largo Colombo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  250, 1 , 'Largo Colombo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  750, 2 , 'Largo Colombo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1875, 3 , 'Largo Colombo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2250, 4 , 'Largo Colombo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2750, 5 , 'Largo Colombo' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  55, 0 , 'Viale Costantino' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  275, 1 , 'Viale Costantino' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  825, 2 , 'Viale Costantino' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2000, 3 , 'Viale Costantino' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2500, 4 , 'Viale Costantino' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3000, 5 , 'Viale Costantino' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  55, 0 , 'Viale Traiano' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  275, 1 , 'Viale Traiano' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  825, 2 , 'Viale Traiano' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2000, 3 , 'Viale Traiano' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2500, 4 , 'Viale Traiano' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3000, 5 , 'Viale Traiano' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  60, 0 , 'Piazza Giulio Cesare' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  300, 1 , 'Piazza Giulio Cesare' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  900, 2 , 'Piazza Giulio Cesare' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2125, 3 , 'Piazza Giulio Cesare' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2625, 4 , 'Piazza Giulio Cesare' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3125, 5 , 'Piazza Giulio Cesare' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  65, 0 , 'Via Roma' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  325, 1 , 'Via Roma' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1000, 2 , 'Via Roma' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2250, 3 , 'Via Roma' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2750, 4 , 'Via Roma' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3250, 5 , 'Via Roma' , 0)
+
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  65, 0 , 'Corso Impero' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  325, 1 , 'Corso Impero' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1000, 2 , 'Corso Impero' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2250, 3 , 'Corso Impero' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2750, 4 , 'Corso Impero' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3250, 5 , 'Corso Impero' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  70, 0 , 'Largo Augusto' , 0)
+/
+
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  375, 1 , 'Largo Augusto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1125, 2 , 'Largo Augusto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2500, 3 , 'Largo Augusto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3000, 4 , 'Largo Augusto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3500, 5 , 'Largo Augusto' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  90, 0 , 'Viale dei Giardini' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  500, 1 , 'Viale dei Giardini' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1250, 2 , 'Viale dei Giardini' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  2750,  3 , 'Viale dei Giardini' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3250 ,  4 , 'Viale dei Giardini' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3750, 5 , 'Viale dei Giardini' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  125, 0 , 'Parco della Vittoria' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  500, 1 , 'Parco della Vittoria' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  1500, 2 , 'Parco della Vittoria' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  3500, 3 , 'Parco della Vittoria' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  4250, 4 , 'Parco della Vittoria' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  5000, 5 , 'Parco della Vittoria' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  65, 0 , 'Stazione Nord' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  125, 1 , 'Stazione Nord' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  250, 2 , 'Stazione Nord' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  500, 3 , 'Stazione Nord' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  65, 0 , 'Stazione Sud' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  125, 1 , 'Stazione Sud' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  250, 2 , 'Stazione Sud' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  500, 3 , 'Stazione Sud' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  65, 0 , 'Stazione Est' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  125, 1 , 'Stazione Est' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  250, 2 , 'Stazione Est' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  500, 3 , 'Stazione Est' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  65, 0 , 'Stazione Ovest' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  125, 1 , 'Stazione Ovest' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  250, 2 , 'Stazione Ovest' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  500, 3 , 'Stazione Ovest' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  50, 0 , 'Società Acqua Potabile' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  250, 1 , 'Società Acqua Potabile' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  50, 0 , 'Società Elettrica' , 0)
+/
+insert into rendita ( Prezzo , NumRendita , NomeContratto , IdPartita) 
+            values (  250, 1 , 'Società Elettrica' , 0)
+
+/
+--INSERIMENTO MOSSE PARTITA 0
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fiasco' , 0 , NULL ,
+ NULL , NULL , 'Vicolo Corto' , NULL , 0 , 0  , NULL,0);
+ COMMIT;
+/
+
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fiasco' , 0 , NULL ,
+ NULL , NULL , 'Via Accademia' , NULL , 0 , 0  , NULL,1);
+COMMIT;
+/
+
+
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fiasco' , 0 , NULL ,
+ NULL , NULL , 'Piazza Dante' , NULL , 0 , 0  , NULL,2);
+COMMIT;
+/
+
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fiasco' , 0 , NULL ,
+ NULL , NULL , 'Via Marco Polo' , NULL , 0 , 0  , NULL,3);
+COMMIT;
+/
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fiasco' , 0 , NULL ,
+ NULL , NULL , 'Piazza Giulio Cesare' , NULL , 0 , 0  , NULL,4);
+COMMIT;
+/
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fiasco' , 0 , NULL ,
+ NULL , NULL , 'Via Roma' , NULL , 0 , 0  , NULL,5);
+COMMIT;
+/
+
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fungo' , 0 , NULL ,
+ NULL , NULL , 'Vicolo Stretto' , NULL , 0 , 0  , NULL,0);
+COMMIT;
+/
+
+
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fungo' , 0 , NULL ,
+ NULL , NULL , 'Viale Monterosa' , NULL , 0 , 0  , NULL,1);
+COMMIT;
+/--RE INSERISCI DA QUI
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fungo' , 0 , NULL ,
+ NULL , NULL , 'Corso Raffaello' , NULL , 0 , 0  , NULL,2);
+COMMIT;
+/
+
+
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fungo' , 0 , NULL ,
+ NULL , NULL , 'Corso Magellano' , NULL , 0 , 0  , NULL,3);
+COMMIT;
+/
+
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fungo' , 0 , NULL ,
+ NULL , NULL , 'Corso Impero' , NULL , 0 , 0  , NULL,4);
+COMMIT;
+/
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Fungo' , 0 , NULL ,
+ NULL , NULL , 'Parco della Vittoria' , NULL , 0 , 0  , NULL,5);
+COMMIT;
+/
+-- PERA
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Pera' , 0 , NULL ,
+ NULL , NULL , 'Bastioni Gran Sasso' , NULL , 0 , 0  , NULL,0);
+COMMIT;
+/-- INSERIRE DA QUI
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Pera' , 0 , NULL ,
+ NULL , NULL , 'Viale Vesuvio' , NULL , 0 , 0  , NULL,1);
+COMMIT;
+/
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Pera' , 0 , NULL ,
+ NULL , NULL , 'Viale dei Giardini' , NULL , 0 , 0  , NULL,2);
+COMMIT;
+/
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Pera' , 0 , NULL ,
+ NULL , NULL , 'Largo Augusto' , NULL , 0 , 0  , NULL,3);
+COMMIT;
+/
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Pera' , 0 , NULL ,
+ NULL , NULL , 'Largo Colombo' , NULL , 0 , 0  , NULL,4);
+COMMIT;
+/
+
+
+insert into MOSSA values ( 0 , 0 , 0 , 0 ,0 , 1 , NULL , 'Pera' , 0 , NULL ,
+ NULL , NULL , 'Via Verdi' , NULL , 0 , 0  , NULL,5);
+COMMIT;
+/
+
+
+insert into MOSSA values ( 0 , 7, 6 , 1 ,1 , 2 , NULL , 'Fiasco' , 0 , 7 ,
+ 0 , 'è il vostro compleanno: ogni giocatore vi regala 25 euro.' , NULL , NULL , NULL , 0  , 0,0);
+
+COMMIT;
+/
+
+insert into MOSSA values( 0 , 9 , 4 , 5 , 1 , 0 , 'Viale Vesuvio' , 'Fungo' , 0 , NULL , NULL, 
+			NULL , NULL , 0 , NULL ,  0  , NULL , 0);
+COMMIT;
+/
+
+
+insert into MOSSA values ( 0 , 7 , 6 , 1 , 1 , 2 , NULL , 'Pera' , 0 , 7 , 0 , 'è il vostro compleanno: ogni giocatore vi regala 25 euro.' , NULL , NULL , NULL, 0 , 0 , 0 ); 
+COMMIT;
+/
+
+
+insert into MOSSA values( 7 , 12 , 2 , 3 , 2 , 1 , NULL , 'Fiasco' , 0 , NULL , 
+				NULL , NULL , 'Società Elettrica' , 0 , 0 , 0 , NULL , 0);
+
+COMMIT;
+/
+
+insert into MOSSA values( 9 , 17 , 3 , 5 , 2 , 2 , NULL , 'Fungo' , 0 , 17 , 0 , 
+'scade il vostro premio di assicurazione: pagate 125 euro.' , NULL , NULL , NULL , 0 , 0 , 0 );
+COMMIT;
+/
+
+insert into MOSSA values( 7 , 16 , 4 , 5 , 2 , 0 , 'Via Verdi', 'Pera' , 0 , 
+			NULL , NULL , 0 , NULL , 0 , NULL , 0 , NULL , 0); 
+
+COMMIT;
+/
+insert into MOSSA values( 12 ,22 ,4 , 6 , 3 , 2 , NULL , 'Fiasco' , 0 , 22 , 0 , 
+			'maturano le cedole delle vostre cartelle di rendita, ritirate 375 euro.',
+			NULL , NULL , NULL , 0  , 0 , 0); 
+COMMIT;
+/
+
+insert into MOSSA values ( 17 , 29 , 6 , 6, 3 , 0 , 'Piazza Giulio Cesare' , 'Fungo' , 0 , 
+			NULL , NULL , NULL , NULL , 0 , NULL , 0 , NULL , 0);
+COMMIT;
+
+/
+--Seconda Mossa di Fungo
+insert into MOSSA values ( 29 , 31 , 1 , 2 , 3 , 0 , 'Via Roma' , 'Fungo' ,  0 , NULL , NULL , NULL , NULL  , 0 , NULL , 0, NULL , 1);
+COMMIT;
+/
+--Prima mossa di Pera
+insert into MOSSA values ( 16 , 26 , 5 , 5, 3 , 1 , NULL , 'Pera' , 0 , NULL , NULL , NULL , 'Viale Costantino' , NULL , 0 , 0 , NULL , 0 );
+COMMIT;
+/
+insert into MOSSA values ( 26 , 33 , 3 , 4 , 3 , 2 , NULL , 'Pera' , 0 , 33  , 0 , 'andate in prigione direttamente e senza passare dal via.' , NULL , NULL , NULL , 0 , 0 , 1);
+COMMIT;
+/
+
+insert into MOSSA values( 22 , 32 , 6 , 4 , 4 , 0 , 'Corso Impero' , 'Fiasco' , 0 , NULL , NULL , NULL , NULL , 0 , NULL , 0 , NULL , 0);
+COMMIT;
+/
+Insert into MOssa values( 31 , 34 , 2 , 1 , 4 , 0 , 'Largo Augusto' , 'Fungo' , 0 , NULL , NULl , NULL , NULL , 0 , NULL , 0 , NULL , 0);
+Commit;
+/
+--Provalo con A posizione diversa da 10
+Insert into Mossa values ( 10 , 10 , 1 , 4 , 4 , 2 , NULL , 'Pera' , 0 , 10 , 0 , NULL , NULL , NULL , NULL  , 0 , NULL , 0 );
+Commit; 
+/
+--Controllare i soldi dal via
+Insert into Mossa values( 32 , 1 , 5 , 4 , 5 , 0 , 'Vicolo Corto',  'Fiasco' , 0  , NULL , NULL , NULL , NULL , 0 , NULL, 0, NULL , 0);
+COMMIT;
+/
+Insert into Mossa values ( 34 , 4 , 6 , 4 , 5 , 2 , NULL , 'Fungo' , 0 , 4, 0 , NULL , NULL , NULL , NULl , 0 , NULL , 0);  
+COMMIT;
+/
+Insert into Mossa values( 10 , 20 , 5 , 5 , 5 , 2 , NULL , 'Pera' , 0 , 20 , 0 , NULL , NULL , NULL , NULL, 0  , NULL , 0);
+COMMIT;
+/
+Insert into Mossa values ( 1 , 8 , 3 , 4, 6 , 0 , 'Viale Monterosa' , 'Fiasco' , 0 , NULL , NULL , NULL , NULL , 0 , NULL , 0, NULL , 0 );
+Commit;
+/
+insert into Mossa values ( 4 , 7 , 1 , 2, 6 , 2 , NULL , 'Fungo' , 0 , 7 , 0 , 'uscite gratis di prigione, se ci siete.' , NULL , NULL , NULL , 0 , 0 , 0);
+Commit;
+/
+insert into Mossa values ( 20 , 25 , 2 , 3 , 6 , 1 , NULL , 'Pera' , 0 , NULL , NULL , NULL , 'Stazione Nord' , 0 , 0 , 0 , NULL , 0);
+Commit;
+/
+
+insert into Mossa values( 8 , 14 , 2 , 4 , 7 , 1 , NULL , 'Fiasco' , 0 , NULL , NUll , NULL , 'Piazza Università' , 0 , 0 , 0 , NULL , 0);
+Commit;
+/
+insert into Mossa values( 7 , 19 ,6 , 6, 7 ,  0 , 'Piazza Dante' , 'Fungo' , 0 ,  NULL , NULL , NULL , NULL , 0 , NULL , 0 , NULL , 0);
+commit;
+/
+insert into Mossa values( 19, 30 ,5 , 6, 7 ,  2 , NULL  , 'Fungo' , 0 ,  30  , 0 , NULL , NULL , NULL , NULL , 0 , NULL , 1);
+commit;
+/
+insert into MOssa values( 25 , 33 , 3 , 5 , 7 , 2 , NULL , 'Pera' , 0 , 33 , 0 , 'ritornate al vicolo corto.' , NULL , 0 , NULL, 0 , 0 , 0);
+Commit;
+/
+

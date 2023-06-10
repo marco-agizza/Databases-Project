@@ -1,0 +1,243 @@
+Create Table Edilizia
+(
+Edificio Varchar2(10) Not NULL,
+Constraint Pk0 Primary Key(Edificio),
+constraint Edif check (Edificio='Casa' OR Edificio='Albergo')
+ );
+
+Create Table Tabellone(
+	ID_Tab char(3) NOT NULL,
+	Num_Probabilita INTEGER NOT NULL,
+	Num_Imprevisti INTEGER NOT NULL, 
+	Constraint Pk1 primary key(ID_Tab),
+	constraint NumProb check ( Num_Probabilita=16 ),
+	constraint NumImp check ( Num_Imprevisti = 16)
+);
+
+
+Create Table Giocatore(
+	Nome Varchar2(10) NOT NULL,
+	Cognome Varchar2(15) NOT NULL,
+	Username Varchar2(10),
+	PartiteVinte Integer DEFAULT 0,
+	PartitePerse Integer DEFAULT 0,
+	Constraint Pk3 Primary Key(Username)
+);
+
+Create table Partita(
+		IDPartita Integer,
+		Username Varchar2(10),
+		Id_tab char(3) NOT NULL,
+
+		NumeroGiocatori integer NOT NULL,
+		
+		StartP TIMESTAMP NOT NULL,
+		
+		EndP TIMESTAMP,
+		NumeroTurni Integer,
+		Constraint pk72 primary key(IDPartita),
+		constraint fk194 foreign key(Id_tab) references Tabellone(ID_Tab),
+	        constraint fk300 foreign key(username) references giocatore(username),
+		constraint numeromaxplayer check ( NumeroGiocatori<=6 )
+			
+);
+
+Create Table Partecipante(
+	Pedina Varchar2(8),
+	Eliminato Integer NOT NULL,
+	Username Varchar2(10),
+	
+	IDPartita Integer,
+	constraint pk4 primary key(pedina,IDPartita),
+	Constraint Ped Check ( Pedina in ( 'Fungo' , 'Fiasco' , 'Mela' , 'Pera' , 'Candela' , 'Pianta')),
+	Constraint Deleted Check ( Eliminato =0 Or Eliminato=1),
+	Constraint Fk2 foreign key(Username) references Giocatore(Username)
+,
+	
+	constraint fkpartit1 foreign key(IDPartita) REFERENCES Partita(IDPartita)
+		ON DELETE CASCADE
+			
+);
+
+Create Table LogPagamento(
+	Pedina1 Varchar2(8) NOT NULL,
+	Pedina2 Varchar2(8) NOT NULL,
+	Turno Integer NOT NULL,
+	PrezzoPagato NUMBER(8,2),
+	
+	IDPartita1 INTEGER,
+	
+	IDPartita2 INTEGER,
+	Ordine Integer,
+	Posizione Integer,
+	Constraint Fk3 foreign key(Pedina1,IDPartita1) references Partecipante(Pedina,IDPartita),
+	Constraint Fk4 foreign key(Pedina2,IDPartita2) references Partecipante(Pedina,IDPartita)
+			ON DELETE CASCADE,
+	Constraint U1 Unique(Pedina1, Pedina2, Turno , Posizione , Ordine)
+);
+
+Create Table Carta(
+		Descrizione Varchar2(100) Not NULL,
+		NumeroCarta Integer ,
+		Denaro Number(8,2),
+		ImpOProb Varchar2(15) not NULL,
+		Possedibile Integer Not NULL,
+		Pedina varchar2(10),
+		
+		IdPartitaPed INTEGER,
+		IDPartita INTEGER,
+		Pago Integer,
+		Ricevo Integer,
+		Destinazione Integer , 
+		Constraint Pk8 primary key(Descrizione,IDPartita),
+		Constraint Ped5 Check ( Pedina in ( 'Fungo' , 'Fiasco' , 'Mela' , 'Pera' , 'Candela' , 'Pianta')),	
+		Constraint fk21 foreign key(Pedina, IDPartitaPed) references Partecipante(Pedina,IDPartita),
+		Constraint PossCheck check ( Possedibile=1 or Possedibile=0),
+		Constraint TipoSpecial check ( ImpOProb in ( 'Imprevisti' , 'Probabilita')),
+		Constraint CheckPago check ( Pago=1 or Pago=0),
+		Constraint CheckRicevo check( Ricevo=1 or Ricevo=0),
+		
+		constraint fk32 foreign key (idpartita) References partita(IdPartita)
+			ON DELETE CASCADE
+);
+		
+CReate Table LogPartecipante (
+			Saldo Number(8,2),
+			NumContratti Integer DEFAULT 0,
+			Turno integer,
+			Posizione Integer,
+			Pedina Varchar2(8),
+			
+			IDPartita Integer,
+			Ordine Integer ,
+			InPrigione Integer,
+			Constraint U99 Unique(Ordine , IdPartita, Turno, Pedina),
+			Constraint CheckPrigione check (Inprigione =0 or  Inprigione=1),
+			Constraint Ped6 Check ( Pedina in ( 'Fungo' , 'Fiasco' , 'Mela' , 'Pera' , 'Candela' , 'Pianta')),
+			Constraint Fk20 foreign key(Pedina,IDPartita) references Partecipante(Pedina,IDPartita)
+					ON DELETE CASCADE,
+			Constraint MaxContratti check ( NumContratti <=29),
+			Constraint MaxPos2 check( Posizione >=0 And Posizione <=40)			
+			
+);
+
+Create Table Speciale(
+  	Descrizione Varchar2(300) NOT NULL,
+	Denaro Number(8,2),
+	TipoSpecial Varchar2(20) NOT NULL,
+	Posizione Integer,
+	ID_Tab char(3),
+	IDPartita INTEGER,
+	constraint pk2 primary key(posizione, IDPartita),
+	constraint fk1 foreign key(ID_Tab) references Tabellone(ID_Tab) 
+			on delete cascade,
+	constraint PosizSAmmesse check ( Posizione=0 Or Posizione=2 or posizione=4 or posizione=7 or posizione=10 or posizione=17 or posizione=20 or posizione=22 or posizione=30 or posizione=33 or posizione=36 or posizione=38),
+	Constraint Spec check( TipoSpecial  in ( 'TassaPatrimoniale' , 'Probabilita' , 'Imprevisti' , 'Prigione' , 'VaiInPrigioni' , 'Transito', 'ParcheggioGratuito' , 'TassaDelLusso', 'Via')),
+	
+	Constraint fkest1 FOREIGN KEY(IDPartita) REFERENCES Partita(IDPartita)
+		ON DELETE CASCADE
+);
+
+create Table Contratti(
+		ValoreIpotecario Number(8,2) Not null,
+		Prezzo Number(8,2) Not NULL ,
+		Acquistata Integer NOT NULL,
+		PrezzoLavori Number(8,2) ,
+		Colore Varchar2(10),
+		Tipo Varchar2(10),
+		Nome Varchar2(25),
+		Posizione Integer NOT NULL,
+		Pedina Varchar2(8),
+		
+		IDPartita INTEGER,
+		
+		IDPartita1 INTEGER,
+		Id_Tabellone Char(3) NOT NULL,
+		Constraint fk5 foreign Key(Id_Tabellone) references Tabellone(ID_Tab) 
+				on delete cascade,
+		Constraint pk6 primary key (Nome,IDPartita),
+		constraint fk6 foreign key(Pedina,IDPartita1) references Partecipante(Pedina,IDPartita),
+		Constraint Ped3 Check ( Pedina in ( 'Fungo' , 'Fiasco' , 'Mela' , 'Pera' , 'Candela' , 'Pianta')),	
+		Constraint Color Check ( Colore in ( 'Rosso' , 'Verde', 'Viola', 'Marrone' , 'Blu', 'Arancione ' , 'Giallo ' , 'Azzurro')),
+		Constraint Acquisto check ( Acquistata = 0 Or Acquistata=1),
+		Constraint Services check ( Tipo in ( 'Societa' , 'Stazione')),
+		
+		constraint posizcammesse check ( Posizione<>0 AND Posizione<>2 and posizione<>4 and posizione<>7 and posizione<>10 and posizione<>17 and posizione<>20 and posizione<>22 and posizione<>30 and posizione<>33 and posizione<>36 and posizione<>38),
+		
+		constraint fkest2 FOREIGN KEY (IDPartita) REFERENCES Partita(IDPartita)
+				ON DELETE CASCADE
+);
+
+
+Create Table Costruisce(
+		IdEd Varchar2(10) Not NULL,
+		NomeContratto Varchar2(25) NOT NULL,
+		
+		IDPartita INTEGER,
+		Constraint fk7 foreign key(Ided) references Edilizia(Edificio),
+		Constraint fk8 foreign key(NomeContratto,IDPartita) references Contratti(Nome,IDPartita)
+			ON DELETE CASCADE
+); 
+
+
+Create Table Rendita (
+		Prezzo Number(8,2) NOT NULL,
+		NumRendita Integer NOT NULL ,
+		NomeContratto VARCHAR(25) NOT NULL,
+		
+		IDPartita INTEGER,
+		Constraint fk9 foreign key(NomeContratto,IDPartita) references Contratti(Nome,IDPartita)
+			ON DELETE CASCADE,
+		Constraint CheckRendita check ( NumRendita>=0 AND NumRendita <6),
+		Constraint U2 unique( Prezzo, NumRendita, NomeContratto , IdPartita)
+);
+
+
+
+Create Table Mossa (
+	DaPosizione Integer Not NULL,
+	APosizione Integer Not NULL,
+	Dado1 Integer Not NULL,
+	Dado2 Integer Not NULL,
+	Turno Integer Not null,
+	TipoMossa Varchar2(15) NOT NULL,
+	NomeContratto Varchar2(25),
+	Pedina Varchar2(8) Not NULL,
+	IdPartita1 integer,
+	PosizioneSpec integer,
+	IDPartitaSpec integer,
+	DescrizioneCarta varchar2(100),
+	NomeContrattoAcq varchar2(25),
+	IDPartita INTEGER,
+	IDPArtitaAcq INTEGER,
+	IdPartitaPed INteger,
+	
+	IDPartitaCarta INTEGER,
+	Sezione Integer,
+	Constraint MaxSpost1 check ( Dado1 >=0 AND Dado1 <=6),	
+	Constraint MaxSpost2 check ( Dado2 >=0 AND Dado2 <=6),
+	Constraint CheckMossa check ( TipoMossa >=0 AND TipoMossa<=2),
+	Constraint fk12 foreign Key(NomeContratto,IDPartita) references Contratti(Nome,IDPartita),
+	Constraint fk13 foreign key(Pedina,IdPartitaPed) references Partecipante(Pedina,IdPartita),
+	Constraint fk14 foreign key(idPartita1) references Partita(IDPartita)
+			ON DELETE CASCADE,
+	constraint fk15 foreign key(PosizioneSpec,IDPartitaSpec) references Speciale(Posizione,IDPartita),
+	constraint fk16 foreign key(DescrizioneCarta,IdPartitaCarta) references Carta(Descrizione,IDPartita),
+	constraint fk17 foreign key(NomeContrattoAcq,IDPartitaAcq) references Contratti(Nome,IDPartita),
+	constraint Trovarsi check ( (NomeContratto = NULL AND PosizioneSpec <> NULL) or ( NomeContratto <>NULL and PosizioneSpec = NULL)),
+	constraint pk24 primary key(Turno,Pedina,Sezione,IdPartita1)
+	
+);	
+
+Create Table Turno(
+		Posizione Integer not null,
+		
+		IDPartita INTEGER,
+		Descrizione Varchar2(100) not null,
+		Numero Integer not null,
+		
+		IDPartitaCarta INTEGER,
+		constraint fk18 foreign key(Posizione,IDPartita) references Speciale( Posizione,IDPartita),
+		constraint fk19 foreign key(Descrizione,IDPArtitaCarta) references Carta(Descrizione,IDPartita)
+			ON DELETE CASCADE
+);
